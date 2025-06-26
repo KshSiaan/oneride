@@ -19,9 +19,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={sourceSerif.variable} suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`${sourceSerif.variable} antialiased`}
+      suppressHydrationWarning
+    >
       <head />
-      <body>
+      <body className="overflow-x-hidden scroll-smooth!">
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
