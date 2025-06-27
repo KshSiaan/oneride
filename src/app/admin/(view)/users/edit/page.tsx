@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import EventTable from "./event-table";
+import EventTable from "./edit-table";
 
 export default function Page() {
   return (

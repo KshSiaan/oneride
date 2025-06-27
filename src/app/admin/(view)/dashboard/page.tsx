@@ -1,12 +1,15 @@
 "use client";
 import {
+  BusFrontIcon,
   CalendarCheck,
   CalendarOff,
   CalendarPlus2,
+  MailIcon,
   Menu,
   TrendingDown,
   TrendingUp,
   UserIcon,
+  UserPlus2Icon,
 } from "lucide-react";
 import React from "react";
 import { ChartPart } from "./chart-part";
@@ -52,12 +55,41 @@ export default function Page() {
         <CardHeader>
           <CardTitle>Quick Actions</CardTitle>
         </CardHeader>
-        <CardContent className="w-full">
+        <CardContent className="w-full grid grid-cols-4 gap-6">
           <Card>
-            <CardContent>
-              <div className="size-18 bg-primary ">
-                <CalendarPlus2 />
+            <CardContent className="flex flex-col justify-center items-center gap-2">
+              <div className="size-12 rounded-full flex items-center justify-center bg-primary ">
+                <CalendarPlus2 className="size-6" />
               </div>
+              <h3>Create new event</h3>
+              <p className="text-xs">Set up a new transportation event</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="flex flex-col justify-center items-center gap-2">
+              <div className="size-12 rounded-full flex items-center justify-center bg-primary ">
+                <BusFrontIcon className="size-6" />
+              </div>
+              <h3>Add Charter Request</h3>
+              <p className="text-xs">Request a private charter service</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="flex flex-col justify-center items-center gap-2">
+              <div className="size-12 rounded-full flex items-center justify-center bg-primary ">
+                <UserPlus2Icon className="size-6" />
+              </div>
+              <h3>Invite User</h3>
+              <p className="text-xs">Send invitation to new users</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="flex flex-col justify-center items-center gap-2">
+              <div className="size-12 rounded-full flex items-center justify-center bg-primary ">
+                <MailIcon className="size-6" />
+              </div>
+              <h3>Send Email</h3>
+              <p className="text-xs">Contact users or partners</p>
             </CardContent>
           </Card>
         </CardContent>
