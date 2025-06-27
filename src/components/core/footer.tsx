@@ -33,9 +33,9 @@ export default function Footer() {
 
       <div className="space-y-3! flex flex-col">
         <h3 className="text-lg font-bold">SUPPORT</h3>
-        <Link href="/help">FAQs</Link>
+        <Link href="/faq">FAQs</Link>
         <Link href="/tnc">Terms & services</Link>
-        <Link href="/tnc">Partner with us</Link>
+        <Link href="/partner">Partner with us</Link>
       </div>
 
       <div className="space-y-3! flex flex-col">

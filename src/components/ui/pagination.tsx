@@ -54,7 +54,7 @@ function PaginationLink({
       data-slot="pagination-link"
       data-active={isActive}
       className={cn(
-        "border-2 rounded-full! " +
+        "border-2 rounded! " +
           buttonVariants({
             variant: isActive ? "outline" : "ghost",
             size,
@@ -75,7 +75,7 @@ function PaginationPrevious({
       aria-label="Go to previous page"
       size="icon"
       className={cn(
-        "gap-1 border-2 border-accent-foreground rounded-full",
+        "gap-1 border-2 border-accent-foreground rounded",
         className
       )}
       {...props}
@@ -94,7 +94,7 @@ function PaginationNext({
       aria-label="Go to next page"
       size="icon"
       className={cn(
-        "gap-1 rounded-full border-2 border-accent-foreground",
+        "gap-1 rounded border-2 border-accent-foreground",
         className
       )}
       {...props}
