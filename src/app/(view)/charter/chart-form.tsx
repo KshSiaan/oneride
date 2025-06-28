@@ -202,7 +202,7 @@ export default function ChartForm() {
         />
         <Button
           type="submit"
-          className="w-1/2 font-semibold text-foreground rounded"
+          className="w-full md:w-2/3 lg:w-1/2 font-semibold text-foreground rounded"
         >
           Submit
         </Button>

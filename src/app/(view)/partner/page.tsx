@@ -14,8 +14,8 @@ export default function Page() {
         style={{ backgroundImage: `url('/image/partner.jpg')` }}
       >
         <div className="h-full w-full flex justify-center items-center backdrop-blur-xs backdrop-brightness-50">
-          <div className="w-1/2 flex flex-col justify-around items-center gap-12 text-center">
-            <h1 className="text-4xl font-semibold">
+          <div className="px-4! lg:w-1/2 flex flex-col justify-around items-center gap-12 text-center">
+            <h1 className="text-2xl lg:text-4xl font-semibold">
               Ride to Your Next Adventure
             </h1>
             <h3 className="text-lg">
@@ -23,22 +23,24 @@ export default function Page() {
               Zealand. No parking hassles, just good times.
             </h3>
             <div className="w-full flex justify-center items-center">
-              <Button className="py-8! px-12! rounded text-xl text-foreground">
+              <Button className="lg:py-8! lg:px-12! rounded lg:text-xl text-foreground">
                 Get a Quote
               </Button>
             </div>
           </div>
         </div>
       </header>
-      <main className="my-12! px-[7%]! font-serif text-center">
+      <main className="my-12! px-4! lg:px-[7%]! font-serif text-center">
         <div className="relative w-full mb-12! space-y-6!">
-          <h1 className="text-4xl font-semibold">Why Charter With Us</h1>
-          <h3 className="text-lg">
+          <h1 className="text-2xl lg:text-4xl font-semibold">
+            Why Charter With Us
+          </h1>
+          <h3 className="text-sm lg:text-lg">
             We provide premium bus charter services with a focus on comfort,
             safety, and reliability.
           </h3>
         </div>
-        <div className="grid grid-cols-4 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {charterCards.map((x, i) => (
             <Card key={i} className="rounded-none">
               <CardContent className="flex flex-col justify-center items-center gap-6 aspect-square">
@@ -50,13 +52,13 @@ export default function Page() {
           ))}
         </div>
         <div className="relative w-full mb-12! space-y-6! mt-24!">
-          <h1 className="text-4xl font-semibold">Perfect For</h1>
-          <h3 className="text-lg">
+          <h1 className="text-2xl lg:text-4xl font-semibold">Perfect For</h1>
+          <h3 className="text-sm lg:text-lg">
             Our bus charter services are ideal for all kinds of group
             transportation needs.
           </h3>
         </div>
-        <div className="grid grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {Array.from({ length: 8 }).map((_, i) => (
             <Card
               className="p-4! overflow-hidden border-0 aspect-square flex flex-col justify-between items-start"

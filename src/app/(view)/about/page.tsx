@@ -12,9 +12,9 @@ export default function Page() {
         style={{ backgroundImage: `url('/image/about.jpg')` }}
       >
         <div className="h-full w-full flex justify-center items-center backdrop-blur-xs backdrop-brightness-50">
-          <div className="w-1/2 flex flex-col justify-around items-center gap-12 text-center">
-            <h1 className="text-6xl font-semibold">Who we are</h1>
-            <h3 className="text-lg">
+          <div className="lg:w-1/2 flex flex-col justify-around items-center gap-12 text-center">
+            <h1 className="text-3xl lg:text-6xl font-semibold">Who we are</h1>
+            <h3 className="text-sm px-4! lg:text-lg">
               We are an event transportation platform focused on connecting
               people to their favorite events with ease. Whether it’s a concert,
               sports game, or special gathering, we make getting there simple
@@ -25,10 +25,10 @@ export default function Page() {
           </div>
         </div>
       </header>
-      <main className="my-12! px-[7%]! font-serif">
+      <main className="my-12! px-4! lg:px-[7%]! font-serif">
         <h2 className=" text-center text-4xl">Our core team member</h2>
 
-        <div className="my-12! grid grid-cols-4 gap-6">
+        <div className="my-12! grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {Array.from({ length: 8 }).map((_, i) => (
             <Card key={i}>
               <CardContent className="flex items-center gap-4">
@@ -49,7 +49,7 @@ export default function Page() {
           ))}
         </div>
         <h2 className="text-4xl text-center mt-24!">Why People Trust Us</h2>
-        <div className="my-12! grid grid-cols-3 gap-6">
+        <div className="my-12! grid md:grid-cols-3 gap-6">
           {trust.map((x, i) => (
             <Card key={i}>
               <CardContent className="">
@@ -66,11 +66,13 @@ export default function Page() {
           ))}
         </div>
         <div className="flex flex-col justify-center items-center gap-8">
-          <h2 className="text-4xl text-center mt-24!">Why People Trust Us</h2>
-          <p className="text-xl text-center">
+          <h2 className="text-xl lg:text-4xl text-center mt-24!">
+            Why People Trust Us
+          </h2>
+          <p className="text-sm lg:text-xl text-center">
             Experience stress-free event transportation today.
           </p>
-          <Button className="rounded py-6! px-12! text-lg mx-auto! text-foreground">
+          <Button className="rounded py-6! px-12! text-sm lg:text-lg mx-auto! text-foreground">
             Book you first seat
           </Button>
         </div>

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PlusIcon, SearchIcon } from "lucide-react";
+import { FileDownIcon, PlusIcon, SearchIcon } from "lucide-react";
 import React from "react";
 import {
   Select,
@@ -9,20 +9,47 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import EventTable from "./edit-table";
+import EventTable from "./event-table";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function Page() {
   return (
     <section className="p-4!">
       <div className="flex justify-between items-center w-full">
         <div className="space-y-3!">
-          <h1 className="text-2xl">Event Management</h1>
-          <p>Manage all upcoming and past events from one place</p>
+          <h1 className="text-2xl">Charter Requests</h1>
+          <p>Manage all charter booking requests from users</p>
         </div>
         <Button className="rounded text-foreground" size="lg">
           <PlusIcon />
           Create New Event
         </Button>
+      </div>
+      <div className="w-full grid grid-cols-4 gap-6 mt-6!">
+        <Card className="aspect-[2/1]">
+          <CardContent className="w-full h-full flex flex-col justify-center items-center gap-6">
+            <h2 className="text-5xl text-primary">47</h2>
+            <p className="text-lg">Total Inquiries</p>
+          </CardContent>
+        </Card>
+        <Card className="aspect-[2/1]">
+          <CardContent className="w-full h-full flex flex-col justify-center items-center gap-6">
+            <h2 className="text-5xl text-primary">47</h2>
+            <p className="text-lg">Pending Request</p>
+          </CardContent>
+        </Card>
+        <Card className="aspect-[2/1]">
+          <CardContent className="w-full h-full flex flex-col justify-center items-center gap-6">
+            <h2 className="text-5xl text-primary">47</h2>
+            <p className="text-lg">Accepted Partners</p>
+          </CardContent>
+        </Card>
+        <Card className="aspect-[2/1]">
+          <CardContent className="w-full h-full flex flex-col justify-center items-center gap-6">
+            <h2 className="text-5xl text-primary">47</h2>
+            <p className="text-lg">Rejected Submissions</p>
+          </CardContent>
+        </Card>
       </div>
       <div className="w-full grid grid-cols-6 mt-6! gap-6">
         <div className="w-full border bg-none rounded-lg flex items-center px-4! bg-secondary col-span-3">
@@ -54,16 +81,10 @@ export default function Page() {
             <SelectItem value="system">Ended</SelectItem>
           </SelectContent>
         </Select>
-        <Select>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="All Dates" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="light">Today</SelectItem>
-            <SelectItem value="dark">This week</SelectItem>
-            <SelectItem value="system">This Month</SelectItem>
-          </SelectContent>
-        </Select>
+        <Button variant="outline" className="bg-background! rounded-md">
+          <FileDownIcon />
+          Export PDF
+        </Button>
       </div>
       <EventTable />
     </section>

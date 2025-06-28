@@ -12,13 +12,13 @@ export default function Page() {
         height={1000}
         width={1000}
         alt="bus-icon"
-        className="h-[50dvh] aspect-square"
+        className="h-[20dvh] md:h-[30dvh] lg:h-[50dvh] aspect-square"
       />
-      <p className="text-3xl text-center">
+      <p className="text-lg lg:text-3xl text-center">
         Zero risk booking means you can relax! <br /> Free cancelations until 7
         days prior <br /> Only pay when the trip is confirmed.
       </p>
-      <p className="text-xl mt-12!">
+      <p className="text-lg lg:text-xl mt-12!">
         Log in with your{" "}
         <Link href="/auth" className="text-primary hover:underline">
           ONERIDE
@@ -27,10 +27,10 @@ export default function Page() {
       </p>
       <div className="w-full flex justify-center mt-12!">
         <Button
-          className="w-1/2 text-lg text-foreground py-6! flex justify-between items-center rounded-lg"
+          className="lg:w-1/2 text-lg text-foreground py-6! flex justify-between items-center rounded-lg"
           asChild
         >
-          <Link href="/add-rides/continue">
+          <Link href="/add-rides/details">
             <span>Continue As Guest</span>
             <span className="size-6 text-primary rounded-full bg-foreground flex flex-row justify-center items-center">
               <ChevronRightIcon />

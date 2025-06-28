@@ -2,8 +2,8 @@ import React from "react";
 
 export default function Page() {
   return (
-    <div className="w-4/5 mx-auto! !py-12 px-[7%]!">
-      <h1 className="text-6xl text-center font-bold text-white mb-4! !mt-4">
+    <div className="lg:w-4/5 mx-auto! !py-12 px-4! lg;px-[7%]! text-sm md:text-base">
+      <h1 className="text-3xl lg:text-6xl text-center font-bold text-white mb-4! !mt-4">
         Terms & Conditions
       </h1>
       <p className="mb-6!">Effective Date: 22/6/2025</p>

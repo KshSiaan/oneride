@@ -14,7 +14,6 @@ import {
   EyeIcon,
   FileDownIcon,
   TrashIcon,
-  Users2Icon,
 } from "lucide-react";
 import {
   Popover,
@@ -63,16 +62,20 @@ export default function EventTable() {
         <TableBody>
           {customers.map((x, index) => (
             <TableRow key={index}>
-              <TableCell className="">{x.username}</TableCell>
-              <TableCell className="">{x.email}</TableCell>
-              <TableCell className="">{x.role}</TableCell>
-              <TableCell className="">{x.date}</TableCell>
-              <TableCell className="">
+              <TableCell className="text-center">{x.username}</TableCell>
+              <TableCell className="text-center">{x.email}</TableCell>
+              <TableCell className="text-center">
+                <Badge className="bg-green-700">{x.role}</Badge>
+              </TableCell>
+              <TableCell className="text-center">{x.date}</TableCell>
+              <TableCell className="text-center">
                 <Badge className="bg-green-700">{x.status}</Badge>
               </TableCell>
               <TableCell className="text-center !space-x-2">
-                <Button variant="ghost" className="" size="icon">
-                  <EyeIcon />
+                <Button variant="ghost" className="" size="icon" asChild>
+                  <Link href="users/view">
+                    <EyeIcon />
+                  </Link>
                 </Button>
                 <Button variant="ghost" size="icon" asChild>
                   <Link href={"events/edit"}>

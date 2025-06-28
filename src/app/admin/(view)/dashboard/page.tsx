@@ -14,6 +14,7 @@ import {
 import React from "react";
 import { ChartPart } from "./chart-part";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
 export default function Page() {
   return (
     <>
@@ -56,42 +57,51 @@ export default function Page() {
           <CardTitle>Quick Actions</CardTitle>
         </CardHeader>
         <CardContent className="w-full grid grid-cols-4 gap-6">
-          <Card>
-            <CardContent className="flex flex-col justify-center items-center gap-2">
-              <div className="size-12 rounded-full flex items-center justify-center bg-primary ">
-                <CalendarPlus2 className="size-6" />
-              </div>
-              <h3>Create new event</h3>
-              <p className="text-xs">Set up a new transportation event</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="flex flex-col justify-center items-center gap-2">
-              <div className="size-12 rounded-full flex items-center justify-center bg-primary ">
-                <BusFrontIcon className="size-6" />
-              </div>
-              <h3>Add Charter Request</h3>
-              <p className="text-xs">Request a private charter service</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="flex flex-col justify-center items-center gap-2">
-              <div className="size-12 rounded-full flex items-center justify-center bg-primary ">
-                <UserPlus2Icon className="size-6" />
-              </div>
-              <h3>Invite User</h3>
-              <p className="text-xs">Send invitation to new users</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="flex flex-col justify-center items-center gap-2">
-              <div className="size-12 rounded-full flex items-center justify-center bg-primary ">
-                <MailIcon className="size-6" />
-              </div>
-              <h3>Send Email</h3>
-              <p className="text-xs">Contact users or partners</p>
-            </CardContent>
-          </Card>
+          <Link href="create-event">
+            <Card className="hover:scale-105  transition-transform">
+              <CardContent className="flex flex-col justify-center items-center gap-2">
+                <div className="size-12 rounded-full flex items-center justify-center bg-primary ">
+                  <CalendarPlus2 className="size-6" />
+                </div>
+                <h3>Create new event</h3>
+                <p className="text-xs">Set up a new transportation event</p>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link href="request-charter">
+            <Card>
+              <CardContent className="flex flex-col justify-center items-center gap-2">
+                <div className="size-12 rounded-full flex items-center justify-center bg-primary ">
+                  <BusFrontIcon className="size-6" />
+                </div>
+                <h3>Add Charter Request</h3>
+                <p className="text-xs">Request a private charter service</p>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="invite-user">
+            <Card>
+              <CardContent className="flex flex-col justify-center items-center gap-2">
+                <div className="size-12 rounded-full flex items-center justify-center bg-primary ">
+                  <UserPlus2Icon className="size-6" />
+                </div>
+                <h3>Invite User</h3>
+                <p className="text-xs">Send invitation to new users</p>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link href="send-email">
+            <Card>
+              <CardContent className="flex flex-col justify-center items-center gap-2">
+                <div className="size-12 rounded-full flex items-center justify-center bg-primary ">
+                  <MailIcon className="size-6" />
+                </div>
+                <h3>Send Email</h3>
+                <p className="text-xs">Contact users or partners</p>
+              </CardContent>
+            </Card>
+          </Link>
         </CardContent>
       </Card>
     </>

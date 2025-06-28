@@ -56,17 +56,19 @@ export default function HeroCarousel({
       >
         <CarouselContent>
           {slides.slice(1).map((slide, i) => (
-            <CarouselItem key={i} className="basis-1/2 !ml-4">
+            <CarouselItem key={i} className="lg:basis-1/2 !ml-4">
               <Card className="!p-0 overflow-hidden rounded-none border-0">
                 <CardContent
                   className="flex h-[80dvh] items-center justify-center bg-zinc-800 bg-blend-luminosity !p-0 overflow-hidden bg-center bg-no-repeat bg-cover"
                   style={{ backgroundImage: `url('${slide.image}')` }}
                 >
                   <div className="h-full w-full flex flex-col justify-end items-start space-y-6! p-6! font-serif">
-                    <h3 className="text-3xl">Way To</h3>
-                    <h2 className="text-5xl">Eminem Live in Concert </h2>
-                    <h3 className="text-3xl">Auckland Stadium</h3>
-                    <p className="text-xl text-primary">
+                    <h3 className="text-xl lg:text-3xl">Way To</h3>
+                    <h2 className="text-3xl lg:text-5xl">
+                      Eminem Live in Concert{" "}
+                    </h2>
+                    <h3 className="text-xl lg:text-3xl">Auckland Stadium</h3>
+                    <p className="text-base text-primary">
                       June 21, 2025 · 7:30 PM
                     </p>
                   </div>
@@ -78,10 +80,10 @@ export default function HeroCarousel({
       </Carousel>
 
       {/* Left Blur */}
-      <div className="pointer-events-none absolute left-0 top-0 h-full w-1/4 bg-gradient-to-r from-background/80 to-transparent backdrop-blur-sm z-10" />
+      <div className="pointer-events-none absolute left-0 top-0 h-full w-1/4 bg-gradient-to-r from-background/80 to-transparent lg:backdrop-blur-sm z-10" />
 
       {/* Right Blur */}
-      <div className="pointer-events-none absolute right-0 top-0 h-full w-1/4 bg-gradient-to-l from-background/80 to-transparent backdrop-blur-sm z-10" />
+      <div className="pointer-events-none absolute right-0 top-0 h-full w-1/4 bg-gradient-to-l from-background/80 to-transparent lg:backdrop-blur-sm z-10" />
 
       {/* Dots */}
       <div className="flex justify-center items-center !mt-4 gap-2">

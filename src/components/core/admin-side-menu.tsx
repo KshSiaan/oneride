@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 // import {
 //   CategoriesIcon,
@@ -16,7 +17,7 @@ import Image from "next/image";
 import {
   LayoutDashboardIcon,
   CalendarCheckIcon,
-  TicketIcon,
+  // TicketIcon,
   LayoutGridIcon,
   BookmarkIcon,
   UsersIcon,
@@ -24,6 +25,7 @@ import {
   HandshakeIcon,
   SettingsIcon,
   LogOutIcon,
+  ChevronRight,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import {
@@ -42,6 +44,7 @@ export default function AdminSideMenu() {
   const router = useRouter();
   const pathname = usePathname();
   const [current, setCurrent] = useState("dashboard");
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const pathParts = pathname.split("/");
@@ -58,6 +61,13 @@ export default function AdminSideMenu() {
     router.push(`/admin/${key}`);
   };
 
+  const toggleSection = (key: string) => {
+    setOpenSections((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
+
   const items = [
     {
       label: "Dashboard",
@@ -69,11 +79,11 @@ export default function AdminSideMenu() {
       key: "events",
       icon: <CalendarCheckIcon className="size-6" />,
     },
-    {
-      label: "Ticketing",
-      key: "ticketing",
-      icon: <TicketIcon className="size-6" />,
-    },
+    // {
+    //   label: "Ticketing",
+    //   key: "ticketing",
+    //   icon: <TicketIcon className="size-6" />,
+    // },
     {
       label: "Categories",
       key: "categories",
@@ -103,6 +113,23 @@ export default function AdminSideMenu() {
       label: "Settings",
       key: "settings",
       icon: <SettingsIcon className="size-6" />,
+      children: [
+        {
+          label: "Personal information",
+          key: "info",
+          icon: <ChevronRight className="size-6" />,
+        },
+        {
+          label: "About us",
+          key: "about",
+          icon: <ChevronRight className="size-6" />,
+        },
+        {
+          label: "Terms & conditions",
+          key: "tnc",
+          icon: <ChevronRight className="size-6" />,
+        },
+      ],
     },
   ];
   return (
@@ -117,16 +144,63 @@ export default function AdminSideMenu() {
       <div className="m-6! bg-secondary rounded-lg p-4! flex-1 flex flex-col justify-start items-start gap-4">
         {items.map((x, i) => (
           <div key={i} className="w-full">
-            <Button
-              onClick={() => handleClick(x.key)}
-              variant={"ghost"}
-              size="lg"
-              className={cn("w-full justify-start gap-2 rounded", {
-                "!text-primary font-bold": current === x.key,
-              })}
-            >
-              {x.icon} {x.label}
-            </Button>
+            {x.children ? (
+              <>
+                <Button
+                  onClick={() => toggleSection(x.key)}
+                  variant="ghost"
+                  size="lg"
+                  className="w-full justify-between gap-2 rounded"
+                >
+                  <span className="flex items-center gap-2">
+                    {x.icon} {x.label}
+                  </span>
+                  <ChevronRight
+                    className={cn(
+                      `transition-transform`,
+                      openSections.settings ? "rotate-90" : "rotate-0"
+                    )}
+                  />
+                  {/* {console.log(openSections)} */}
+                </Button>
+                {openSections[x.key] && (
+                  <div
+                    className={cn(
+                      "pl-6! mt-2! flex flex-col gap-2",
+                      "transition-all duration-300 ease-in-out",
+                      openSections[x.key]
+                        ? "opacity-100 scale-y-100 max-h-[500px]"
+                        : "opacity-0 scale-y-0 max-h-0 overflow-hidden"
+                    )}
+                  >
+                    {x.children.map((child: any, j: number) => (
+                      <Button
+                        key={j}
+                        onClick={() => handleClick(child.key)}
+                        variant="ghost"
+                        size="sm"
+                        className={cn("justify-start gap-2 rounded", {
+                          "!text-primary font-bold": current === child.key,
+                        })}
+                      >
+                        {child.icon} {child.label}
+                      </Button>
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : (
+              <Button
+                onClick={() => handleClick(x.key)}
+                variant="ghost"
+                size="lg"
+                className={cn("w-full justify-start gap-2 rounded", {
+                  "!text-primary font-bold": current === x.key,
+                })}
+              >
+                {x.icon} {x.label}
+              </Button>
+            )}
           </div>
         ))}
         <div className="flex-1 flex justify-end items-end w-full">

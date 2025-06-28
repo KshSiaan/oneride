@@ -28,11 +28,11 @@ export default function Page() {
         className="w-full h-[calc(100dvh-64px)] bg-no-repeat bg-center bg-cover"
         style={{ backgroundImage: `url('/image/slide1.png')` }}
       >
-        <div className="h-full w-full backdrop-brightness-50 backdrop-grayscale flex flex-col justify-end items-start p-12! gap-6">
+        <div className="h-full w-full backdrop-brightness-50 backdrop-grayscale flex flex-col justify-end items-start p-4! lg:p-12! gap-6">
           <Badge className="py-2! px-6! rounded-full text-foreground">
             CONCERT
           </Badge>
-          <h1 className="text-shadow-md text-shadow-foreground text-6xl relative">
+          <h1 className="text-shadow-md text-shadow-foreground text-3xl lg:text-6xl relative">
             Eminem Live in Concert
             <div className="absolute -bottom-3 h-1 bg-primary w-[40%]"></div>
           </h1>
@@ -47,7 +47,7 @@ export default function Page() {
           </div>
         </div>
       </header>
-      <main className="w-full flex flex-col justify-center items-center mb-12! space-y-6! font-serif px-[7%]!">
+      <main className="w-full flex flex-col justify-center items-center mb-12! space-y-6! font-serif px-4! lg:px-[7%]!">
         <Card className="w-full">
           <CardContent className="flex flex-row justify-center items-center gap-4">
             <Button
@@ -75,11 +75,11 @@ export default function Page() {
           width="1200"
           height="650"
           loading="lazy"
-          className="border-0 w-[80dvw] mx-auto! block mb-12! h-[80dvh] col-span-2 grayscale brightness-[70%]"
+          className="border-0 w-[80dvw] mx-auto! block mb-12! h-[40dvh] lg:h-[80dvh] col-span-2 grayscale brightness-[70%]"
           src="https://www.google.com/maps/embed/v1/search?q=Murfreesboro&key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8"
         ></iframe>
-        <section className="w-full grid grid-cols-8 gap-6" id="about">
-          <Card className="col-span-5">
+        <section className="w-full grid lg:grid-cols-8 gap-6" id="about">
+          <Card className="lg:col-span-5">
             <CardContent>
               <h2 className="text-2xl font-semibold relative w-fit">
                 About The Event{" "}
@@ -100,7 +100,7 @@ export default function Page() {
               </p>
             </CardContent>
           </Card>
-          <div className="col-span-3 space-y-6!">
+          <div className="lg:col-span-3 space-y-6!">
             <Card className="w-full">
               <CardContent className="space-y-12!">
                 <div className="flex flex-row justify-start items-center gap-4">
@@ -146,7 +146,7 @@ export default function Page() {
                   </div>
                   <span className="text-lg">Safety Tips</span>
                 </div>
-                <ul className="pl-16! list-disc list-inside leading-relaxed">
+                <ul className="pl-4! mt-4! space-y-2! lg:pl-16! list-disc list-inside leading-relaxed text-sm lg:text-base">
                   <li>
                     Arrive at your pickup location at least 10 minutes early
                   </li>
@@ -166,7 +166,7 @@ export default function Page() {
           <h2 className="flex items-center text-3xl">
             <BusFront className="text-primary mr-2! size-8" /> Available Rides
           </h2>
-          <div className="mt-6! grid grid-cols-4 gap-4">
+          <div className="mt-6! grid md:grid-cols-2 lg:grid-cols-4 gap-4">
             {Array.from({ length: 4 }).map((_, i) => (
               <Card className="w-full max-w-sm" key={i}>
                 <CardHeader>
@@ -213,12 +213,12 @@ export default function Page() {
         </section>
         <Card className="w-full">
           <CardContent className=" flex flex-row justify-start items-center gap-4">
-            <div className="size-12 bg-primary rounded-full flex justify-center items-center text-secondary">
+            <div className="size-12! aspect-square bg-primary rounded-full flex justify-center items-center text-secondary">
               <PercentIcon />
             </div>
             <div className="flex flex-col justify-between items-start">
-              <h3 className="text-xl">Group Discount Available</h3>
-              <p className="text-muted-foreground text-sm">
+              <h3 className="lg:text-xl">Group Discount Available</h3>
+              <p className="text-muted-foreground text-xs md:text-sm">
                 Book 4 or more seats together and get 10% off your total
                 booking! Perfect for groups of friends or family attending the
                 event together.

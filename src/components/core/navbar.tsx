@@ -64,7 +64,9 @@ export default function ResponsiveNavbar() {
         </div>
 
         <div className="flex items-center gap-1 md:gap-2">
-          <Button className="rounded-sm text-foreground">Log in</Button>
+          <Button className="rounded-sm text-foreground" asChild>
+            <Link href="/auth">Log in</Link>
+          </Button>
 
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>

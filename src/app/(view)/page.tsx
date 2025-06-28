@@ -47,13 +47,15 @@ export default function Home() {
       <header>
         <HeroCarousel slides={slideResouce} />
       </header>
-      <main className=" py-12! font-serif">
+      <main className="py-12! font-serif">
         <div className="w-full space-y-6!">
-          <h1 className="text-5xl text-center">Find Your Bus Ride</h1>
-          <h3 className="text-2xl text-center">
+          <h1 className="text-2xl lg:text-5xl text-center">
+            Find Your Bus Ride
+          </h1>
+          <h3 className=" px-2! text-sm lg:text-2xl text-center">
             Choose your event and see available pickup points near you.
           </h3>
-          <div className="w-1/3 grid grid-cols-2 gap-6 mx-auto!">
+          <div className="px-4! lg:w-1/3 grid grid-cols-2 gap-6 mx-auto!">
             <Select>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder={"Event"}></SelectValue>
@@ -83,12 +85,12 @@ export default function Home() {
           width="1200"
           height="650"
           loading="lazy"
-          className="border-0 w-[80dvw] mx-auto! block mt-12! h-[80dvh] col-span-2 grayscale brightness-[70%]"
+          className="border-0 w-[80dvw] mx-auto! block mt-12! h-[40dvh] md:h-[60dvh] lg:h-[80dvh] col-span-2 grayscale brightness-[70%]"
           src="https://www.google.com/maps/embed/v1/search?q=Murfreesboro&key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8"
         ></iframe>
         <div className="space-y-6! mt-12!">
-          <h1 className="text-4xl text-center">Upcoming Events</h1>
-          <h3 className="text-2xl text-center">
+          <h1 className="text-2xl lg:text-4xl text-center">Upcoming Events</h1>
+          <h3 className="text-sm lg:text-2xl text-center">
             Find your ride to the next big thing
           </h3>
           <Marquee pauseOnHover className="[--duration:20s]">

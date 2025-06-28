@@ -1,10 +1,7 @@
 import Sidebar from "@/components/core/admin-side-menu";
-import { Button } from "@/components/ui/button";
-import { BellIcon } from "lucide-react";
 import type { Metadata } from "next";
-import Link from "next/link";
 export const metadata: Metadata = {
-  title: "PoolValet Admin Panel",
+  title: "OneRide Admin Panel",
 };
 
 export default function RootLayout({
@@ -21,17 +18,7 @@ export default function RootLayout({
           </div>
         </div>
         <div className="col-span-9 flex flex-col justify-start items-start">
-          <div className="h-[64px] w-full flex flex-row justify-between items-center !pr-6">
-            {/* <h3 className="text-2xl font-bold">Hello, Rick</h3> */}
-            <div className=""></div>
-            <div className="flex items-center gap-2">
-              <Button size={"icon"} variant="ghost" asChild>
-                <Link href="/admin/notifications">
-                  <BellIcon fill="#000000" />
-                </Link>
-              </Button>
-            </div>
-          </div>
+          <div className="h-[34px]"></div>
           <div className="w-full flex-1">{children}</div>
         </div>
       </main>

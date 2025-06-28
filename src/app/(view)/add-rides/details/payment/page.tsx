@@ -17,7 +17,7 @@ import Link from "next/link";
 export default function Page() {
   const stripePromise = loadStripe("pk_test_qblFNYngBkEdjEZ16jxxoWSM");
   return (
-    <main className="min-h-dvh w-dvw flex flex-row justify-center items-center">
+    <main className="px-4! lg:px-0! min-h-dvh w-dvw flex flex-row justify-center items-center">
       <Elements
         stripe={stripePromise}
         options={{
@@ -37,7 +37,7 @@ export default function Page() {
           },
         }}
       >
-        <Card className="w-2/3">
+        <Card className=" lg:w-2/3">
           <CardHeader>
             <CardTitle>Complete Payment</CardTitle>
             <CardDescription>
@@ -49,7 +49,7 @@ export default function Page() {
               <PaymentElement />
               <span className="flex flex-row justify-start items-center gap-4 mt-6!">
                 <Checkbox />
-                <Label>
+                <Label className="text-xs md:text-sm">
                   I authorize this payment and agree to the Terms of Service and
                   Privacy Policy.
                 </Label>

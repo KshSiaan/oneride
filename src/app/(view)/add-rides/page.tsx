@@ -6,21 +6,21 @@ import React from "react";
 
 export default function Page() {
   return (
-    <main className="font-serif px-[7%]! my-12!">
+    <main className="font-serif px-4! lg:px-[7%]! my-12!">
       <section className="space-y-3!">
-        <h1 className="text-2xl">Add Rides</h1>
+        <h1 className="text-lg lg:text-2xl">Add Rides</h1>
         <h2>Newmarket, ON : 1111 Davis Dr, Newmarket, ON L3Y 8X2, Canada</h2>
         <p>Sunday, July 13</p>
       </section>
-      <section className="border-2 border-primary mt-12! grid grid-cols-3 gap-6 p-6! rounded-lg">
+      <section className="border-2 border-primary mt-12! lg:grid grid-cols-3 gap-6 p-6! rounded-lg">
         <div className="">
           <h3 className="text-2xl">Roundtrip Outbound</h3>
           {Array.from({ length: 2 }).map((_, i) => (
             <div
-              className="w-full grid grid-cols-3 col-span-3 gap-2 mt-6!"
+              className="w-full grid md:grid-cols-3 col-span-3 gap-2 mt-6!"
               key={i}
             >
-              <div className="">
+              <div className="space-y-2!">
                 <p className="text-base">Depart</p>
                 <p className="text-2xl">06:00 Am</p>
                 <p className="text-sm">Fri,13 Jun</p>
@@ -35,7 +35,7 @@ export default function Page() {
                   <div className="absolute size-5 rounded-full bg-[#FD962F] right-0 top-1/2 -translate-y-1/2"></div>
                 </div>
               </div>
-              <div className="">
+              <div className="space-y-2!">
                 <p className="text-base">12:00 Pm</p>
                 <p className="text-2xl">12:00 Pm</p>
                 <p className="text-sm">Fri,13 Jun</p>
@@ -50,20 +50,24 @@ export default function Page() {
             height={1000}
             width={1000}
             alt="thumbnail"
-            className="aspect-square! w-4/5 rounded-full rotate-y-180"
+            className="aspect-square! md:size-34 lg:w-4/5 rounded-full rotate-y-180"
           />
-          <p className="mt-6! text-lg">20 riders needed by Jul 6</p>
+          <p className="mt-6! text-base lg:text-lg">
+            20 riders needed by Jul 6
+          </p>
         </div>
         <div className="flex flex-col justify-between items-end">
           <div className="space-y-2!">
-            <h3 className="text-5xl text-end text-green-500">$50</h3>
+            <h3 className="text-3xl lg:text-5xl text-end text-green-500">
+              $50
+            </h3>
             <p>Per Roundtrip Ride </p>
           </div>
           <div className="flex justify-center items-center gap-3">
             <Button className="text-foreground rounded-full" size={"icon"}>
               <Minus />
             </Button>
-            <p className="text-2xl">1</p>
+            <p className="text-lg lg:text-2xl">1</p>
             <Button className="text-foreground rounded-full" size={"icon"}>
               <Plus />
             </Button>
@@ -72,7 +76,7 @@ export default function Page() {
       </section>
       <div className="flex justify-end mt-12!">
         <Button
-          className="w-1/2 text-lg text-foreground py-6! flex justify-between items-center rounded-lg"
+          className="w-1/2 lg:text-lg text-foreground py-6! flex justify-between items-center rounded-lg"
           asChild
         >
           <Link href="/add-rides/continue">

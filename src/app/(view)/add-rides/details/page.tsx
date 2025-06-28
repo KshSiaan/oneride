@@ -14,9 +14,9 @@ import React from "react";
 
 export default function Page() {
   return (
-    <main className="px-[7%]! my-12! font-serif">
-      <div className="w-full grid grid-cols-8 gap-6">
-        <div className="col-span-5 space-y-6!">
+    <main className="px-4! lg:px-[7%]! my-12! font-serif h-[200dvh] md:h-[150dvh] lg:h-auto">
+      <div className="w-full grid grid-cols-1 lg:grid-cols-8 gap-6 ">
+        <div className="col-span-1 lg:col-span-5 space-y-6!">
           <Card className="">
             <CardHeader className="flex flex-row justify-start items-center gap-4 border-b">
               <div className="size-12 rounded-full bg-primary flex justify-center items-center">
@@ -29,7 +29,7 @@ export default function Page() {
                 </p>
               </div>
             </CardHeader>
-            <CardContent className="px-12! grid grid-cols-2 gap-6">
+            <CardContent className="px-4! lg:px-12! grid lg:grid-cols-2 gap-6">
               <div className="space-y-4!">
                 <Label>Mobile no.</Label>
                 <Input placeholder="+123" />
@@ -52,7 +52,7 @@ export default function Page() {
                 </p>
               </div>
             </CardHeader>
-            <CardContent className="px-12! grid grid-cols-2 gap-6">
+            <CardContent className="px-12! grid lg:grid-cols-2 gap-6">
               <div className="space-y-4!">
                 <Label>First name</Label>
                 <Input placeholder="Enter name" />
@@ -81,7 +81,7 @@ export default function Page() {
             </CardContent>
           </Card>
         </div>
-        <div className="col-span-3 h-12">
+        <div className="cols-span-1 lg:col-span-3 h-12">
           <Card className="w-full">
             <CardHeader className="flex items-center gap-2">
               <Image

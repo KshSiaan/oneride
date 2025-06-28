@@ -8,9 +8,9 @@ import {
 } from "@/components/ui/accordion";
 export default function Questions() {
   return (
-    <div className="w-full px-[7%]! grid grid-cols-2 gap-6 mt-24! pt-24! text-start">
+    <div className="w-full px-4! lg:px-[7%]! grid lg:grid-cols-2 gap-6 mt-24! border-t pt-12!">
       <div className="space-y-6!">
-        <h2 className="text-6xl">
+        <h2 className="text-3xl lg:text-6xl">
           Got Questions ? <br /> We&apos;ve Got Answers
         </h2>
         <p>

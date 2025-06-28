@@ -5,7 +5,7 @@ export default function GettingThere() {
   return (
     <>
       <h1 className="text-4xl text-center mt-12!">Getting there is simple</h1>
-      <div className="grid grid-cols-4 gap-6 px-6!">
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 px-6!">
         {Array.from({ length: 4 }).map((_, i) => (
           <Card
             className="p-3! overflow-hidden border-0 aspect-square flex flex-col justify-between items-start"

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PlusIcon, SearchIcon } from "lucide-react";
+import { FileDownIcon, PlusIcon, SearchIcon } from "lucide-react";
 import React from "react";
 import {
   Select,
@@ -16,8 +16,8 @@ export default function Page() {
     <section className="p-4!">
       <div className="flex justify-between items-center w-full">
         <div className="space-y-3!">
-          <h1 className="text-2xl">Users</h1>
-          <p>Manage and monitor all platform users from one place.</p>
+          <h1 className="text-2xl">Event Management</h1>
+          <p>Manage all upcoming and past events from one place</p>
         </div>
         <Button className="rounded text-foreground" size="lg">
           <PlusIcon />
@@ -54,16 +54,10 @@ export default function Page() {
             <SelectItem value="system">Ended</SelectItem>
           </SelectContent>
         </Select>
-        <Select>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="All Dates" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="light">Today</SelectItem>
-            <SelectItem value="dark">This week</SelectItem>
-            <SelectItem value="system">This Month</SelectItem>
-          </SelectContent>
-        </Select>
+        <Button variant="outline" className="bg-background! rounded-md">
+          <FileDownIcon />
+          Export PDF
+        </Button>
       </div>
       <EventTable />
     </section>

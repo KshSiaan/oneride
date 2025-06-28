@@ -183,7 +183,7 @@ export default function ChartForm() {
         />
         <Button
           type="submit"
-          className="w-1/2 font-semibold text-foreground rounded"
+          className="w-full md:w-auto lg:w-1/2 font-semibold text-foreground rounded"
         >
           Submit partnership request
         </Button>
