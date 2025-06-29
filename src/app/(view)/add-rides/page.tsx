@@ -74,9 +74,12 @@ export default function Page() {
           </div>
         </div>
       </section>
-      <div className="flex justify-end mt-12!">
+      <div className="grid md:grid-cols-2 mt-12! gap-6 w-full">
+        <Button className="w-full lg:w-1/2 lg:text-lg text-foreground py-6! flex justify-between items-center rounded-lg">
+          <span>Add another ticket</span>
+        </Button>
         <Button
-          className="w-1/2 lg:text-lg text-foreground py-6! flex justify-between items-center rounded-lg"
+          className="w-full lg:text-lg text-foreground py-6! flex justify-between items-center rounded-lg"
           asChild
         >
           <Link href="/add-rides/continue">

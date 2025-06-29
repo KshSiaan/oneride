@@ -2,12 +2,7 @@ import EventCard from "@/components/core/event-card";
 import { Marquee } from "@/components/magicui/marquee";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   BusFront,
   CalendarDaysIcon,
@@ -17,10 +12,10 @@ import {
   PercentIcon,
   ShieldCheckIcon,
   User2Icon,
-  Users2Icon,
 } from "lucide-react";
 import Link from "next/link";
 import React from "react";
+import AvailableRides from "./available-rides";
 export default function Page() {
   return (
     <>
@@ -166,51 +161,8 @@ export default function Page() {
           <h2 className="flex items-center text-3xl">
             <BusFront className="text-primary mr-2! size-8" /> Available Rides
           </h2>
-          <div className="mt-6! grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <Card className="w-full max-w-sm" key={i}>
-                <CardHeader>
-                  <div className="flex justify-between items-center mb-2!">
-                    <h3 className="">5:30 PM</h3>
-                    <div className="flex items-center text-gray-400">
-                      <Users2Icon className="text-primary mr-2! size-4" />
-                      <span>12/15 Seats</span>
-                    </div>
-                  </div>
-                  <div className="border-b border-gray-700 mb-4"></div>{" "}
-                  {/* Divider */}
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-3 gap-4 text-center text-gray-300 mb-6!">
-                    <div>
-                      <p className="text-sm font-semibold mb-1!">Pickup</p>
-                      <p className="text-base font-medium">Britomart</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold mb-1!">Duration</p>
-                      <p className="text-base font-medium">15 Min</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold mb-1!">Return</p>
-                      <p className="text-base font-medium">11:30 PM</p>
-                    </div>
-                  </div>
-                  <p className="text-center text-green-500 text-xl font-bold">
-                    $25.99
-                  </p>
-                </CardContent>
-                <CardFooter>
-                  <Button
-                    className="w-full text-white text-lg py-6 rounded-lg shadow-xl"
-                    asChild
-                  >
-                    <Link href="/add-rides">Review & Book</Link>
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
         </section>
+        <AvailableRides />
         <Card className="w-full">
           <CardContent className=" flex flex-row justify-start items-center gap-4">
             <div className="size-12! aspect-square bg-primary rounded-full flex justify-center items-center text-secondary">
