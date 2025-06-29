@@ -26,6 +26,7 @@ import {
   SettingsIcon,
   LogOutIcon,
   ChevronRight,
+  BookCopyIcon,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import {
@@ -98,6 +99,11 @@ export default function AdminSideMenu() {
       label: "Users",
       key: "users",
       icon: <UsersIcon className="size-6" />,
+    },
+    {
+      label: "Blog",
+      key: "blogs",
+      icon: <BookCopyIcon className="size-6" />,
     },
     {
       label: "Charter Requests",

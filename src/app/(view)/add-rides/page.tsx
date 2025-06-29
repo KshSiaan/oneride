@@ -50,11 +50,11 @@ export default function Page() {
             height={1000}
             width={1000}
             alt="thumbnail"
-            className="aspect-square! md:size-34 lg:w-4/5 rounded-full rotate-y-180"
+            className="aspect-square! md:size-34 lg:size-64 rounded-full rotate-y-180"
           />
-          <p className="mt-6! text-base lg:text-lg">
+          {/* <p className="mt-6! text-base lg:text-lg">
             20 riders needed by Jul 6
-          </p>
+          </p> */}
         </div>
         <div className="flex flex-col justify-between items-end">
           <div className="space-y-2!">

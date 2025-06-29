@@ -12,7 +12,7 @@ import {
 export default function Bread() {
   const path = usePathname();
 
-  const segments = path.split("/").filter(Boolean); // removes empty strings from split
+  const segments = path.split("/").filter(Boolean);
 
   const fullPath = (index: number) =>
     "/" + segments.slice(0, index + 1).join("/");

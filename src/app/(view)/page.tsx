@@ -70,7 +70,7 @@ export default function Home() {
             </Select>
             <Select>
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Pickup time"></SelectValue>
+                <SelectValue placeholder="Transport Option"></SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="eminem">All</SelectItem>
@@ -85,8 +85,8 @@ export default function Home() {
           width="1200"
           height="650"
           loading="lazy"
-          className="border-0 w-[80dvw] mx-auto! block mt-12! h-[40dvh] md:h-[60dvh] lg:h-[80dvh] col-span-2 grayscale brightness-[70%]"
-          src="https://www.google.com/maps/embed/v1/search?q=Murfreesboro&key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8"
+          className="border-0 w-full mx-auto! block mt-12! h-[40dvh] md:h-[60dvh] lg:h-[80dvh] col-span-2 grayscale brightness-[70%]"
+          src="https://www.google.com/maps/embed/v1/search?q=Christchurch&key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8"
         ></iframe>
         <div className="space-y-6! mt-12!">
           <h1 className="text-2xl lg:text-4xl text-center">Upcoming Events</h1>
