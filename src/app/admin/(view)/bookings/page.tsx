@@ -16,8 +16,10 @@ export default function Page() {
     <section className="p-4!">
       <div className="flex justify-between items-center w-full">
         <div className="space-y-3!">
-          <h1 className="text-2xl">Event Management</h1>
-          <p>Manage all upcoming and past events from one place</p>
+          <h1 className="text-2xl">Bookings</h1>
+          <p>
+            Track, manage, and take action on every booking across all events.
+          </p>
         </div>
         <Button className="rounded text-foreground" size="lg">
           <PlusIcon />

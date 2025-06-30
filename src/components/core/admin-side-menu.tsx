@@ -27,6 +27,7 @@ import {
   LogOutIcon,
   ChevronRight,
   BookCopyIcon,
+  ContactRoundIcon,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import {
@@ -109,6 +110,11 @@ export default function AdminSideMenu() {
       label: "Charter Requests",
       key: "charter",
       icon: <BusIcon className="size-6" />,
+    },
+    {
+      label: "Allies",
+      key: "allies",
+      icon: <ContactRoundIcon className="size-6" />,
     },
     {
       label: "Partner Inquiries",

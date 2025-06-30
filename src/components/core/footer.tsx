@@ -29,6 +29,7 @@ export default function Footer() {
         <Link href="/about">About us</Link>
         <Link href="/contact">Contact Us</Link>
         <Link href="/events">Events Near You</Link>
+        <Link href="/allies">Allies</Link>
       </div>
 
       <div className="space-y-3! flex flex-col">
