@@ -1,5 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+} from "@/components/ui/card";
 
 import { BusFrontIcon, HeadphonesIcon, MapIcon, RouteIcon } from "lucide-react";
 import React from "react";
@@ -23,8 +28,11 @@ export default function Page() {
               Zealand. No parking hassles, just good times.
             </h3>
             <div className="w-full flex justify-center items-center">
-              <Button className="lg:py-8! lg:px-12! rounded lg:text-xl text-foreground">
-                Get a Quote
+              <Button
+                className="lg:py-8! lg:px-12! rounded lg:text-xl text-foreground"
+                asChild
+              >
+                <a href="#create-charter">Get a Quote</a>
               </Button>
             </div>
           </div>
@@ -58,18 +66,21 @@ export default function Page() {
             transportation needs.
           </h3>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {Array.from({ length: 8 }).map((_, i) => (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {tripData.map((x) => (
             <Card
-              className="p-4! overflow-hidden border-0 aspect-square flex flex-col justify-between items-start"
-              key={i}
+              className="p-3! overflow-hidden border-0 aspect-square flex flex-col justify-between items-start"
+              key={x.title}
             >
               <CardContent
-                className="flex rounded-md items-center flex-1 w-full justify-center bg-zinc-800 bg-blend-luminosity overflow-hidden bg-center bg-no-repeat bg-cover"
-                style={{ backgroundImage: `url('/image/slide1.png')` }}
+                className="flex rounded-md items-center flex-1 w-full justify-center bg-zinc-800 overflow-hidden bg-center bg-no-repeat bg-cover"
+                style={{ backgroundImage: `url('${x.image}')` }}
               ></CardContent>
               <CardFooter className="flex flex-col w-full p-0! justify-start items-start gap-2">
-                <h3 className="text-lg font-semibold">Music Festivals</h3>
+                <h3 className="text-lg font-semibold">{x.title}</h3>
+                <CardDescription className="w-full text-start">
+                  {x.description}
+                </CardDescription>
               </CardFooter>
             </Card>
           ))}
@@ -125,7 +136,10 @@ export default function Page() {
             </div>
           </div>
         </section>
-        <div className="relative w-full mb-12! space-y-6! mt-24!">
+        <div
+          className="relative w-full mb-12! space-y-6! mt-24!"
+          id="create-charter"
+        >
           <h1 className="text-4xl font-semibold">Ready to Charter Your Bus?</h1>
           <h3 className="text-lg">
             Fill out the form below and we&apos;ll get back to you with a quote
@@ -182,5 +196,43 @@ const charterCards = [
     icon: MapIcon,
     title: "Real-Time Tracking",
     desc: "Provide your attendees with live bus tracking so they always know when their ride will arrive.",
+  },
+];
+
+const tripData = [
+  {
+    title: "Group Concert Trips",
+    description:
+      "Arrive together and enjoy the event without worrying about parking or designated drivers.",
+    image: "/image/charter/charter (1).jpg",
+  },
+  {
+    title: "Weddings",
+    description:
+      "Transport your wedding party and guests in style and comfort.",
+    image: "/image/charter/charter (2).jpg",
+  },
+  {
+    title: "Corporate Events",
+    description:
+      "Transport your team to conferences, retreats, or company outings.",
+    image: "/image/charter/charter (3).jpg",
+  },
+  {
+    title: "School Trips",
+    description:
+      "Safe and reliable transportation for students and chaperones.",
+    image: "/image/charter/charter (4).jpg",
+  },
+  {
+    title: "Sports Teams",
+    description: "Get your team to the game together and travel in comfort.",
+    image: "/image/charter/charter (5).jpg",
+  },
+  {
+    title: "Tours",
+    description:
+      "Explore New Zealand’s beautiful landscapes with our comfortable coaches.",
+    image: "/image/charter/charter (6).jpg",
   },
 ];

@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { cn } from "@/lib/utils";
+import { cn, idk } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -24,64 +24,110 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
+import { useMutation } from "@tanstack/react-query";
+import { createCharterApi } from "@/lib/api/core";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   name: z.string().min(1),
-  email: z.string().optional(),
-  phone: z.string(),
-  location: z.string().min(1),
-  name_2686097072: z.coerce.date(),
-  passenger: z.string(),
-  request: z.string().optional(),
+  email: z.string().email().optional(),
+  phone: z.string().min(5),
+  passengerCount: z.coerce.number(),
+  pickupLocation: z.string().min(1),
+  dropoffLocation: z.string().min(1),
+  pickupDateAndTime: z.coerce.date(),
+  purpose: z.string().optional(),
+  specialInstructions: z.string().optional(),
 });
 
 export default function ChartForm() {
+  const [submitted, setSubmitted] = useState(false);
   const navig = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name_2686097072: new Date(),
+      name: "",
+      email: "",
+      phone: "",
+      passengerCount: 1,
+      pickupLocation: "",
+      dropoffLocation: "",
+      pickupDateAndTime: new Date(),
+      purpose: "",
+      specialInstructions: "",
+    },
+  });
+  const { mutate } = useMutation({
+    mutationKey: ["charter"],
+    mutationFn: (body: {
+      name: string;
+      email: string;
+      phone: string;
+      passengerCount: number;
+      pickupLocation: string;
+      dropoffLocation: string;
+      pickupDateAndTime: string;
+      purpose: string;
+      specialInstructions: string;
+    }) => {
+      return createCharterApi(body);
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    navig.push("/charter/thanks");
-    return;
+    const formatted = {
+      ...values,
+      pickupDateAndTime: values.pickupDateAndTime.toISOString(),
+    };
+
     try {
-      console.log(values);
-      toast(
-        <pre className="mt-2! w-full rounded-md p-4!">
-          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-        </pre>
-      );
+      mutate(formatted as idk, {
+        onError: (err) => {
+          toast.error(err.message ?? "Something went wrong..");
+          console.error(err);
+        },
+        onSuccess: (data: idk) => {
+          toast.success(data.message ?? "Successfully Requested your quote!");
+          console.log(data);
+          form.reset();
+          setSubmitted(true);
+          navig.push(`/charter/thanks`);
+        },
+      });
     } catch (error) {
-      console.error("Form submission error", error);
-      toast.error("Failed to submit the form. Please try again.");
+      console.error(error);
+      toast.error("Something went wrong");
     }
+
+    // console.log(formatted);
+
+    // toast(
+    //   <pre className="mt-2 w-full rounded-md p-4">
+    //     <code className="text-white">{JSON.stringify(formatted, null, 2)}</code>
+    //   </pre>
+    // );
   }
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-8! py-10!"
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 py-10">
+        {/* Full name */}
         <FormField
           control={form.control}
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Full name</FormLabel>
+              <FormLabel>Full Name</FormLabel>
               <FormControl>
-                <Input placeholder="Name" type="" {...field} />
+                <Input placeholder="Name" {...field} />
               </FormControl>
-
               <FormMessage />
             </FormItem>
           )}
         />
 
+        {/* Email */}
         <FormField
           control={form.control}
           name="email"
@@ -91,12 +137,12 @@ export default function ChartForm() {
               <FormControl>
                 <Input placeholder="email@email.com" type="email" {...field} />
               </FormControl>
-
               <FormMessage />
             </FormItem>
           )}
         />
 
+        {/* Phone */}
         <FormField
           control={form.control}
           name="phone"
@@ -106,30 +152,60 @@ export default function ChartForm() {
               <FormControl className="w-full">
                 <PhoneInput placeholder="" {...field} defaultCountry="TR" />
               </FormControl>
-
               <FormMessage />
             </FormItem>
           )}
         />
 
+        {/* Passenger count */}
         <FormField
           control={form.control}
-          name="location"
+          name="passengerCount"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Number of Passengers</FormLabel>
+              <FormControl>
+                <Input type="number" placeholder="" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Pickup location */}
+        <FormField
+          control={form.control}
+          name="pickupLocation"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Pickup Location</FormLabel>
+              <FormControl>
+                <Input placeholder="" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Dropoff location */}
+        <FormField
+          control={form.control}
+          name="dropoffLocation"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Drop-off Location</FormLabel>
               <FormControl>
-                <Input placeholder="Location" type="" {...field} />
+                <Input placeholder="" {...field} />
               </FormControl>
-
               <FormMessage />
             </FormItem>
           )}
         />
 
+        {/* Pickup date & time */}
         <FormField
           control={form.control}
-          name="name_2686097072"
+          name="pickupDateAndTime"
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Date & Time</FormLabel>
@@ -137,9 +213,9 @@ export default function ChartForm() {
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
-                      variant={"outline"}
+                      variant="outline"
                       className={cn(
-                        "w-full pl-3! text-left font-normal",
+                        "w-full pl-3 text-left font-normal",
                         !field.value && "text-muted-foreground"
                       )}
                     >
@@ -148,11 +224,11 @@ export default function ChartForm() {
                       ) : (
                         <span>Pick a date</span>
                       )}
-                      <CalendarIcon className="ml-auto! h-4 w-4 opacity-50" />
+                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0!" align="start">
+                <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
                     selected={field.value}
@@ -161,33 +237,33 @@ export default function ChartForm() {
                   />
                 </PopoverContent>
               </Popover>
-
               <FormMessage />
             </FormItem>
           )}
         />
 
+        {/* Purpose */}
         <FormField
           control={form.control}
-          name="passenger"
+          name="purpose"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Number of Passengers</FormLabel>
+              <FormLabel>Purpose</FormLabel>
               <FormControl>
-                <Input placeholder="01" type="number" {...field} />
+                <Input placeholder="birthday party" {...field} />
               </FormControl>
-
               <FormMessage />
             </FormItem>
           )}
         />
 
+        {/* Special instructions */}
         <FormField
           control={form.control}
-          name="request"
+          name="specialInstructions"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Special Requests</FormLabel>
+              <FormLabel>Special Instructions</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="Your message"
@@ -195,16 +271,17 @@ export default function ChartForm() {
                   {...field}
                 />
               </FormControl>
-
               <FormMessage />
             </FormItem>
           )}
         />
+
         <Button
           type="submit"
+          disabled={submitted}
           className="w-full md:w-2/3 lg:w-1/2 font-semibold text-foreground rounded"
         >
-          Submit
+          {submitted ? "Quote Submitted successfully" : "Submit"}
         </Button>
       </form>
     </Form>

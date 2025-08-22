@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { cn } from "@/lib/utils";
+import { cn, idk } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -24,94 +24,126 @@ import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
+import { createPartnershipApi } from "@/lib/api/core";
+import { useCookies } from "react-cookie";
 
 const formSchema = z.object({
-  name: z.string().min(1),
-  email: z.string().optional(),
-  phone: z.string(),
-  location: z.string().min(1),
-  name_2686097072: z.coerce.date(),
-  passenger: z.string(),
-  request: z.string().optional(),
+  organizerName: z.string().min(1),
+  eventName: z.string().min(1),
+  organizerEmail: z.string().email(),
+  eventDate: z.coerce.date(),
+  eventLocation: z.string().min(1),
+  transportationNeeds: z.string().optional(),
 });
 
-export default function ChartForm() {
+export default function PartnershipForm() {
   const navig = useRouter();
+  const [cookies] = useCookies(["token"]);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name_2686097072: new Date(),
+      organizerName: "",
+      eventName: "",
+      organizerEmail: "",
+      eventDate: new Date(),
+      eventLocation: "",
+      transportationNeeds: "",
+    },
+  });
+
+  const { mutate } = useMutation({
+    mutationKey: ["partnership"],
+    mutationFn: (body: {
+      organizerName: string;
+      eventName: string;
+      organizerEmail: string;
+      eventDate: string;
+      eventLocation: string;
+      transportationNeeds: string;
+    }) => {
+      return createPartnershipApi(body, cookies.token); // token here if needed
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    navig.push("/partner/thanks");
-    return;
+    const formatted = {
+      ...values,
+      eventDate: values.eventDate.toISOString(),
+    };
+
     try {
-      console.log(values);
-      toast(
-        <pre className="mt-2! w-full rounded-md p-4!">
-          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-        </pre>
-      );
+      mutate(formatted as idk, {
+        onError: (err) => {
+          toast.error(err.message ?? "Something went wrong..");
+          console.error(err);
+        },
+        onSuccess: (data: idk) => {
+          toast.success(
+            data.message ?? "Successfully submitted partnership request!"
+          );
+          form.reset();
+          navig.push("/partner/thanks");
+        },
+      });
     } catch (error) {
-      console.error("Form submission error", error);
-      toast.error("Failed to submit the form. Please try again.");
+      console.error(error);
+      toast.error("Something went wrong");
     }
   }
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-8! py-10!"
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 py-10">
+        {/* Organizer name */}
         <FormField
           control={form.control}
-          name="name"
+          name="organizerName"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Your name</FormLabel>
+              <FormLabel>Your Name</FormLabel>
               <FormControl>
-                <Input placeholder="Name" type="" {...field} />
+                <Input placeholder="Organizer name" {...field} />
               </FormControl>
-
               <FormMessage />
             </FormItem>
           )}
         />
 
+        {/* Event name */}
         <FormField
           control={form.control}
-          name="email"
+          name="eventName"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Event name</FormLabel>
+              <FormLabel>Event Name</FormLabel>
+              <FormControl>
+                <Input placeholder="Event name" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Email */}
+        <FormField
+          control={form.control}
+          name="organizerEmail"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email Address</FormLabel>
               <FormControl>
                 <Input placeholder="email@email.com" type="email" {...field} />
               </FormControl>
-
               <FormMessage />
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>E-mail address</FormLabel>
-              <FormControl>
-                <Input placeholder="email@email.com" type="email" {...field} />
-              </FormControl>
 
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {/* Event Date */}
         <FormField
           control={form.control}
-          name="name_2686097072"
+          name="eventDate"
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Event Date</FormLabel>
@@ -119,9 +151,9 @@ export default function ChartForm() {
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
-                      variant={"outline"}
+                      variant="outline"
                       className={cn(
-                        "w-full pl-3! text-left font-normal",
+                        "w-full pl-3 text-left font-normal",
                         !field.value && "text-muted-foreground"
                       )}
                     >
@@ -130,11 +162,11 @@ export default function ChartForm() {
                       ) : (
                         <span>Pick a date</span>
                       )}
-                      <CalendarIcon className="ml-auto! h-4 w-4 opacity-50" />
+                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0!" align="start">
+                <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
                     selected={field.value}
@@ -143,49 +175,50 @@ export default function ChartForm() {
                   />
                 </PopoverContent>
               </Popover>
-
               <FormMessage />
             </FormItem>
           )}
         />
+
+        {/* Event Location */}
         <FormField
           control={form.control}
-          name="location"
+          name="eventLocation"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Event Locationsn</FormLabel>
+              <FormLabel>Event Location</FormLabel>
               <FormControl>
-                <Input placeholder="Location" type="" {...field} />
+                <Input placeholder="Event location" {...field} />
               </FormControl>
-
               <FormMessage />
             </FormItem>
           )}
         />
 
+        {/* Transportation needs */}
         <FormField
           control={form.control}
-          name="request"
+          name="transportationNeeds"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Tell us About Transportation needs </FormLabel>
+              <FormLabel>Transportation Needs</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Your message"
+                  placeholder="Tell us about transportation needs"
                   className="resize-none"
                   {...field}
                 />
               </FormControl>
-
               <FormMessage />
             </FormItem>
           )}
         />
+
         <Button
           type="submit"
           className="w-full md:w-auto lg:w-1/2 font-semibold text-foreground rounded"
         >
-          Submit partnership request
+          Submit Partnership Request
         </Button>
       </form>
     </Form>

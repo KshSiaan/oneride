@@ -1,7 +1,7 @@
-import BlogCard from "@/components/core/blog-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import React from "react";
+import BlogList from "./blog-list";
 
 export default function Page() {
   return (
@@ -22,7 +22,7 @@ export default function Page() {
               <Input
                 className="rounded-r-none!"
                 placeholder="Search events or locations...."
-              />{" "}
+              />
               <Button className="rounded-r-lg">Search</Button>
             </div>
           </div>
@@ -34,9 +34,7 @@ export default function Page() {
           <div className="h-1 w-[40%] absolute -bottom-1 bg-primary" />
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <BlogCard key={i} />
-          ))}
+          <BlogList />
         </div>
       </main>
     </>

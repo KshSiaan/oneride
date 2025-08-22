@@ -24,7 +24,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${sourceSerif.variable} antialiased`}
+      className={`${sourceSerif.variable} antialiased scroll-smooth`}
       suppressHydrationWarning
     >
       <head />

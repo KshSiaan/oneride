@@ -16,7 +16,18 @@ import {
 import Link from "next/link";
 import React from "react";
 import AvailableRides from "./available-rides";
-export default function Page() {
+import { notFound } from "next/navigation";
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ id: string }>;
+}) {
+  const storage = await searchParams;
+  const id = storage.id;
+  console.log(id);
+  if (!id) {
+    return notFound();
+  }
   return (
     <>
       <header

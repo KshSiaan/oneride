@@ -44,8 +44,8 @@ export const getBlogsApi = async (token: string) => {
     return howl("/blogs", { method: "GET", token })
 }
 
-export const getBlogByIdApi = async (id: string, token: string) => {
-    return howl(`/blogs/${id}`, { method: "GET", token })
+export const getBlogByIdApi = async (id: string) => {
+    return howl(`/blogs/${id}`, { method: "GET"})
 }
 
 // >>>>>>>>>>> Ally <<<<<<<<<<<<<
@@ -70,10 +70,10 @@ export const deleteAllyApi = async (id: string, token: string) => {
 }
 
 export const getAlliesApi = async (
-    { status, type, page, limit }: { status?: string; type?: string; page: number; limit: number },
+    {page }: { page: number },
     token: string
 ) => {
-    return howl(`/allies?status=${status ?? ""}&type=${type ?? ""}&page=${page}&limit=${limit}`, { method: "GET", token })
+    return howl(`/allies?page=${page}&limit=12`, { method: "GET", token })
 }
 
 // >>>>>>>>>>> Partnership <<<<<<<<<<<<<
@@ -177,16 +177,9 @@ export const deleteEventApi = async (id: string, token: string) => {
 }
 
 export const getEventsApi = async (
-    params: { category?: string; title?: string; adminStatus?: string; filterByQuarter?: string } = {},
     token: string
 ) => {
-    const query = new URLSearchParams()
-    if (params.category) query.append("category", params.category)
-    if (params.title) query.append("title", params.title)
-    if (params.adminStatus) query.append("adminStatus", params.adminStatus)
-    if (params.filterByQuarter) query.append("filterByQuarter", params.filterByQuarter)
-
-    return howl(`/events?${query.toString()}`, { method: "GET", token })
+    return howl(`/events`, {token })
 }
 
 // >>>>>>>>>>> Charter <<<<<<<<<<<<<
@@ -203,9 +196,9 @@ export const createCharterApi = async (
         purpose: string
         specialInstructions: string
     },
-    token: string
+    // token: string
 ) => {
-    return howl("/charters", { method: "POST", body, token })
+    return howl("/charters", { method: "POST", body})
 }
 
 export const updateCharterStatusApi = async (

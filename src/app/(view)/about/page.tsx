@@ -1,8 +1,10 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
-import React from "react";
+import React, { Suspense } from "react";
+import TeamMems from "./team-mems";
+import { Skeleton } from "@/components/ui/skeleton";
+import Link from "next/link";
 
 export default function Page() {
   return (
@@ -29,24 +31,15 @@ export default function Page() {
         <h2 className=" text-center text-4xl">Our core team member</h2>
 
         <div className="my-12! grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <Card key={i}>
-              <CardContent className="flex items-center gap-4">
-                <Avatar className="size-12">
-                  <AvatarImage
-                    src={`https://avatar.iran.liara.run/public/${i}`}
-                  />
-                  <AvatarFallback>UI</AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col justify-between items-start">
-                  <h3 className="text-xl">Nancy Drew</h3>
-                  <p className="text-muted-foreground">
-                    Chief Executive Officer
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+          <Suspense
+            fallback={Array(8)
+              .fill("")
+              .map((_, i) => (
+                <Skeleton className="w-full aspect-video" key={i} />
+              ))}
+          >
+            <TeamMems />
+          </Suspense>
         </div>
         <h2 className="text-4xl text-center mt-24!">Why People Trust Us</h2>
         <div className="my-12! grid md:grid-cols-3 gap-6">
@@ -72,8 +65,11 @@ export default function Page() {
           <p className="text-sm lg:text-xl text-center">
             Experience stress-free event transportation today.
           </p>
-          <Button className="rounded py-6! px-12! text-sm lg:text-lg mx-auto! text-foreground">
-            Book you first seat
+          <Button
+            className="rounded py-6! px-12! text-sm lg:text-lg mx-auto! text-foreground"
+            asChild
+          >
+            <Link href={`/events`}>Book you first seat</Link>
           </Button>
         </div>
       </main>

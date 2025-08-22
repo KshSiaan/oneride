@@ -27,8 +27,11 @@ export default function Page() {
               Zealand. No parking hassles, just good times.
             </h3>
             <div className="w-full flex justify-center items-center">
-              <Button className="lg:py-8! lg:px-12! rounded lg:text-xl text-foreground">
-                Get a Quote
+              <Button
+                className="lg:py-8! lg:px-12! rounded lg:text-xl text-foreground"
+                asChild
+              >
+                <a href="#create-charter">Get a Quote</a>
               </Button>
             </div>
           </div>
@@ -62,27 +65,29 @@ export default function Page() {
             transportation needs.
           </h3>
         </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {Array.from({ length: 8 }).map((_, i) => (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {tripData.map((x) => (
             <Card
               className="p-3! overflow-hidden border-0 aspect-square flex flex-col justify-between items-start"
-              key={i}
+              key={x.title}
             >
               <CardContent
-                className="flex rounded-md items-center flex-1 w-full justify-center bg-zinc-800 bg-blend-luminosity overflow-hidden bg-center bg-no-repeat bg-cover"
-                style={{ backgroundImage: `url('/image/slide1.png')` }}
+                className="flex rounded-md items-center flex-1 w-full justify-center bg-zinc-800 overflow-hidden bg-center bg-no-repeat bg-cover"
+                style={{ backgroundImage: `url('${x.image}')` }}
               ></CardContent>
               <CardFooter className="flex flex-col w-full p-0! justify-start items-start gap-2">
-                <h3 className="text-lg font-semibold">Group Concert Trips</h3>
+                <h3 className="text-lg font-semibold">{x.title}</h3>
                 <CardDescription className="w-full text-start">
-                  Arrive together and enjoy the event without worrying about
-                  parking or designated drivers.
+                  {x.description}
                 </CardDescription>
               </CardFooter>
             </Card>
           ))}
         </div>
-        <div className="relative w-full mb-12! space-y-6! mt-24!">
+        <div
+          className="relative w-full mb-12! space-y-6! mt-24!"
+          id="create-charter"
+        >
           <h1 className="text-2xl lg:text-4xl font-semibold">
             Ready to Charter Your Bus?
           </h1>
@@ -121,5 +126,43 @@ const charterCards = [
     icon: MapIcon,
     title: "Anywhere in NZ",
     desc: "We operate nationwide, from Auckland to Queenstown and everywhere between.",
+  },
+];
+
+const tripData = [
+  {
+    title: "Group Concert Trips",
+    description:
+      "Arrive together and enjoy the event without worrying about parking or designated drivers.",
+    image: "/image/charter/charter (1).jpg",
+  },
+  {
+    title: "Weddings",
+    description:
+      "Transport your wedding party and guests in style and comfort.",
+    image: "/image/charter/charter (2).jpg",
+  },
+  {
+    title: "Corporate Events",
+    description:
+      "Transport your team to conferences, retreats, or company outings.",
+    image: "/image/charter/charter (3).jpg",
+  },
+  {
+    title: "School Trips",
+    description:
+      "Safe and reliable transportation for students and chaperones.",
+    image: "/image/charter/charter (4).jpg",
+  },
+  {
+    title: "Sports Teams",
+    description: "Get your team to the game together and travel in comfort.",
+    image: "/image/charter/charter (5).jpg",
+  },
+  {
+    title: "Tours",
+    description:
+      "Explore New Zealand’s beautiful landscapes with our comfortable coaches.",
+    image: "/image/charter/charter (6).jpg",
   },
 ];

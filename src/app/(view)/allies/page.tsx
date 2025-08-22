@@ -1,12 +1,9 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import React, { Suspense } from "react";
+import AllAllies from "./all-allies";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { ExternalLinkIcon } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
-import React from "react";
-
-export default function Page() {
+export default async function Page() {
   return (
     <>
       <header
@@ -32,31 +29,13 @@ export default function Page() {
         <h2 className=" text-center text-4xl">Our core team member</h2>
 
         <div className="my-12! grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <Card key={i}>
-              <CardContent className="flex flex-col items-center gap-4">
-                <Badge className="mx-auto bg-green-500/60">Pub</Badge>
-                <Avatar className="size-24 border-3 border-primary">
-                  <AvatarImage src={`https://avatar.iran.liara.run/public/0`} />
-                  <AvatarFallback>UI</AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col justify-between items-center">
-                  <h3 className="text-xl text-center w-full">
-                    The Golden Pint Pub
-                  </h3>
-                  <p className="text-muted-foreground text-center">
-                    A cozy spot for craft beers & live music.
-                  </p>
-                </div>
-              </CardContent>
-              <CardFooter className="flex justify-center items-center">
-                <Button className="text-foreground">
-                  <ExternalLinkIcon />
-                  Visit website
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
+          <Suspense
+            fallback={Array.from({ length: 8 }).map((_, i) => (
+              <Skeleton key={`skeleton-${i}`} className="w-full aspect-video" />
+            ))}
+          >
+            <AllAllies />
+          </Suspense>
         </div>
         <div className="">
           <h2 className="text-center mt-12! text-lg md:text-2xl lg:text-4xl">

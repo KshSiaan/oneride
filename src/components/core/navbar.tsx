@@ -1,8 +1,7 @@
 "use client";
-
-import { Menu } from "lucide-react";
+import { ChevronDownIcon, Loader2Icon, Menu } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import {
@@ -14,51 +13,57 @@ import {
 } from "@/components/ui/sheet";
 import { useCookies } from "react-cookie";
 import { useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+import { getOwnProfileApi } from "@/lib/api/core";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { idk } from "@/lib/utils";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
 export default function ResponsiveNavbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [cookies, , removeCookie] = useCookies(["token"]);
+  const [isClient, setIsClient] = useState(false); // ✅ client-only flag
   const { push } = useRouter();
+  const { data, isPending, isSuccess }: idk = useQuery({
+    queryKey: ["user"],
+    queryFn: () => {
+      return getOwnProfileApi(cookies.token);
+    },
+    enabled: !!cookies.token,
+  });
+  useEffect(() => {
+    setIsClient(true); // run only on client
+  }, []);
+
+  if (!isClient) return null; // avoid SSR mismatch
+
+  const navLinks = [
+    { href: "/", label: "Home" },
+    { href: "/events", label: "Events" },
+    { href: "/about", label: "About" },
+    { href: "/news", label: "News & Update" },
+    { href: "/nearby", label: "Events Near You" },
+    { href: "/charter", label: "Charter a Ride" },
+  ];
+
   const NavigationButtons = () => (
     <>
-      <Button variant="ghost" className="font-semibold!" asChild>
-        <Link href="/" onClick={() => setIsOpen(false)}>
-          Home
-        </Link>
-      </Button>
-      <Button variant="ghost" className="font-semibold!" asChild>
-        <Link href="/events" onClick={() => setIsOpen(false)}>
-          Events
-        </Link>
-      </Button>
-      <Button variant="ghost" className="font-semibold!" asChild>
-        <Link href="/about" onClick={() => setIsOpen(false)}>
-          About
-        </Link>
-      </Button>
-      <Button variant="ghost" className="font-semibold!" asChild>
-        <Link href="/news" onClick={() => setIsOpen(false)}>
-          News & Update
-        </Link>
-      </Button>
-      <Button variant="ghost" className="font-semibold!" asChild>
-        <Link href="/nearby" onClick={() => setIsOpen(false)}>
-          Events Near you
-        </Link>
-      </Button>
-      <Button variant="ghost" className="font-semibold!" asChild>
-        <Link href="/charter" onClick={() => setIsOpen(false)}>
-          Charter a ride
-        </Link>
-      </Button>
+      {navLinks.map(({ href, label }) => (
+        <Button key={href} variant="ghost" className="font-semibold!" asChild>
+          <Link href={href} onClick={() => setIsOpen(false)}>
+            {label}
+          </Link>
+        </Button>
+      ))}
     </>
   );
 
   return (
     <>
-      <div className="h-16 relative" />
+      <div className="h-18 relative" />
       <nav>
-        <div className="py-4! px-4! md:px-8! flex flex-row justify-between items-center fixed w-full h-16 top-0 left-0 z-50 bg-background">
+        <div className="py-4! px-4! md:px-8! flex items-center fixed w-full h-18 top-0 left-0 z-50 bg-background">
+          {/* Left: Logo */}
           <div className="flex-shrink-0">
             <Link href="/">
               <Image
@@ -71,25 +76,64 @@ export default function ResponsiveNavbar() {
             </Link>
           </div>
 
-          <div className="hidden lg:flex gap-2 font-serif">
+          {/* Center: Navigation */}
+          <div className="hidden lg:flex flex-1 justify-center gap-2 font-serif">
             <NavigationButtons />
           </div>
 
-          <div className="flex items-center gap-1 md:gap-2">
-            {!cookies.token ? (
-              <Button className="rounded-sm text-foreground" asChild>
+          {/* Right: User / Menu */}
+          <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
+            {isPending ? (
+              <div className="h-12 aspect-video flex items-center justify-center">
+                <Loader2Icon className="animate-spin" />
+              </div>
+            ) : !isSuccess ? (
+              <Button asChild className="rounded-sm text-foreground">
                 <Link href="/auth">Log in</Link>
               </Button>
             ) : (
-              <Button
-                className="rounded-sm text-foreground"
-                onClick={() => {
-                  removeCookie("token");
-                  push("/");
-                }}
-              >
-                Log Out
-              </Button>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <div className="border p-2 rounded-lg flex flex-row justify-between items-center gap-12">
+                    <div className="flex items-center gap-2">
+                      <Avatar>
+                        <AvatarImage src={""} />
+                        <AvatarFallback>UI</AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col justify-center items-start">
+                        <h6>{data.data.name}</h6>
+                        <p className="text-xs text-muted-foreground">
+                          {data.data.email}
+                        </p>
+                      </div>
+                    </div>
+                    <div>
+                      <ChevronDownIcon />
+                    </div>
+                  </div>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="border shadow bg-background/50"
+                  side="bottom"
+                  align="end"
+                >
+                  <div className="p-2 flex flex-col justify-start items-start space-y-4">
+                    <Button className="w-full" asChild>
+                      <Link href={"/profile"}>View Profile</Link>
+                    </Button>
+                    <Button
+                      className="w-full"
+                      variant={"outline"}
+                      onClick={() => {
+                        removeCookie("token", { path: "/" });
+                        push("/");
+                      }}
+                    >
+                      Log out
+                    </Button>
+                  </div>
+                </PopoverContent>
+              </Popover>
             )}
 
             <Sheet open={isOpen} onOpenChange={setIsOpen}>

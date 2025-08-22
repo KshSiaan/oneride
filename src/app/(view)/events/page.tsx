@@ -1,9 +1,11 @@
-import EventCard from "@/components/core/event-card";
+"use server";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import React from "react";
+import React, { Suspense } from "react";
+import Events from "./events";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export default function Page() {
+export default async function Page() {
   return (
     <>
       <header
@@ -23,7 +25,7 @@ export default function Page() {
               <Input
                 className="rounded-r-none!"
                 placeholder="Search events or locations...."
-              />{" "}
+              />
               <Button className="rounded-r-lg">Search</Button>
             </div>
           </div>
@@ -35,9 +37,17 @@ export default function Page() {
           <div className="h-1 w-[40%] absolute -bottom-1 bg-primary" />
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <EventCard key={i} />
-          ))}
+          <Suspense
+            fallback={
+              <>
+                <Skeleton className="w-full aspect-square" />
+                <Skeleton className="w-full aspect-square" />
+                <Skeleton className="w-full aspect-square" />
+              </>
+            }
+          >
+            <Events />
+          </Suspense>
         </div>
       </main>
     </>
