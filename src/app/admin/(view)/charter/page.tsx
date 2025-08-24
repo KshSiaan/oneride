@@ -22,6 +22,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { idk } from "@/lib/utils";
 
 export default function Page() {
   const [search, setSearch] = useState("");
@@ -31,7 +32,7 @@ export default function Page() {
   const [page, setPage] = useState(1);
   const { data, isPending } = useQuery({
     queryKey: ["charter"],
-    queryFn: () => {
+    queryFn: (): idk => {
       return getChartersApi(
         {
           name: search,
