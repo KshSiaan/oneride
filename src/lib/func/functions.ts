@@ -24,5 +24,8 @@ export function timeExtractor(x: string): string {
 }
 
 export function imgCreator(x:string):string{
+    if (x.includes("http")) {
+        return x
+    }
     return `${base_server}/${x}`
 }

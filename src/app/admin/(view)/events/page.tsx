@@ -1,7 +1,8 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PlusIcon, SearchIcon } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 import {
   Select,
   SelectContent,
@@ -10,8 +11,37 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import EventTable from "./event-table";
+import { useQuery } from "@tanstack/react-query";
+import { getCategoriesApi, getEventsApi } from "@/lib/api/core";
+import { useCookies } from "react-cookie";
+import { idk } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Page() {
+  const [cookies] = useCookies(["token"]);
+
+  // State for each select
+  const [selectedCategory, setSelectedCategory] = useState<
+    string | undefined
+  >();
+  const [selectedStatus, setSelectedStatus] = useState<string | undefined>();
+  const [selectedDate, setSelectedDate] = useState<string | undefined>();
+
+  const { data, isPending } = useQuery({
+    queryKey: ["events", selectedCategory, selectedDate, selectedStatus],
+    queryFn: () =>
+      getEventsApi(cookies.token, {
+        filterByQuarter: selectedDate,
+        adminStatus: selectedStatus,
+        category: selectedCategory,
+      }),
+  });
+
+  const { data: categoryData, isPending: categoryPending }: idk = useQuery({
+    queryKey: ["cat"],
+    queryFn: getCategoriesApi,
+  });
+
   return (
     <section className="p-4!">
       <div className="flex justify-between items-center w-full">
@@ -24,6 +54,7 @@ export default function Page() {
           Create New Event
         </Button>
       </div>
+
       <div className="w-full grid grid-cols-6 mt-6! gap-6">
         <div className="w-full border bg-none rounded-lg flex items-center px-4! bg-secondary col-span-3">
           <SearchIcon className="text-muted-foreground size-4" />
@@ -33,39 +64,66 @@ export default function Page() {
             inputMode="search"
           />
         </div>
-        <Select>
+
+        {/* Category Select */}
+        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
           <SelectTrigger className="w-full">
-            <SelectValue placeholder="All categoires" />
+            <SelectValue placeholder="All categories" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="lights">Concert</SelectItem>
-            <SelectItem value="light">Sports events</SelectItem>
-            <SelectItem value="dark">Cultural events</SelectItem>
-            <SelectItem value="system">Food fair</SelectItem>
+            {!categoryPending &&
+              categoryData.data.map((x: { _id: string; name: string }) => (
+                <SelectItem value={x.name} key={x._id} className="capitalize">
+                  {x.name}
+                </SelectItem>
+              ))}
           </SelectContent>
         </Select>
-        <Select>
+
+        {/* Status Select */}
+        <Select value={selectedStatus} onValueChange={setSelectedStatus}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="All Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="light">Active</SelectItem>
-            <SelectItem value="dark">Draft</SelectItem>
-            <SelectItem value="system">Ended</SelectItem>
+            {["active", "draft", "ended"].map((x) => (
+              <SelectItem key={x} value={x} className="capitalize">
+                {x}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
-        <Select>
+
+        {/* Date Range Select */}
+        <Select value={selectedDate} onValueChange={setSelectedDate}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="All Dates" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="light">Today</SelectItem>
-            <SelectItem value="dark">This week</SelectItem>
-            <SelectItem value="system">This Month</SelectItem>
+            {["thisWeek", "thisMonth", "thisYear"].map((x) => (
+              <SelectItem key={x} value={x} className="capitalize">
+                This {x.replace("this", "")}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
-      <EventTable />
+
+      {isPending ? (
+        <div className="mt-6">
+          <Skeleton className="w-full h-12" />
+          <Skeleton className="w-full mt-6 h-[400px]" />
+          <div className="flex justify-end items-center gap-6 mt-6">
+            <Skeleton className="w-24 h-12" />
+            <Skeleton className="w-12 h-12" />
+            <Skeleton className="w-12 h-12" />
+            <Skeleton className="w-12 h-12" />
+            <Skeleton className="w-24 h-12" />
+          </div>
+        </div>
+      ) : (
+        <EventTable data={data} />
+      )}
     </section>
   );
 }

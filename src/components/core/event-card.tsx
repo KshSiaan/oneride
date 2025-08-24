@@ -1,6 +1,8 @@
 import React from "react";
 import { Card, CardContent } from "../ui/card";
 import Link from "next/link";
+import { imgCreator } from "@/lib/func/functions";
+import { blankImg } from "@/lib/config";
 
 export default function EventCard({
   title,
@@ -22,7 +24,9 @@ export default function EventCard({
       <Card className="!p-0 overflow-hidden rounded-none border-0 hover:text-primary! transition-colors">
         <CardContent
           className="flex h-[40dvh] lg:h-[60dvh] aspect-square items-center justify-center bg-zinc-800 bg-blend-luminosity !p-0 overflow-hidden bg-center bg-no-repeat bg-cover"
-          style={{ backgroundImage: `url(${image ?? "/image/slide1.png"})` }}
+          style={{
+            backgroundImage: `url(${image ? imgCreator(image) : blankImg})`,
+          }}
         >
           <div className="h-full w-full backdrop-brightness-50 flex flex-col justify-end items-start space-y-2! lg:space-y-6! p-6! font-serif">
             <h3 className="text-xl lg:text-3xl">Way To</h3>

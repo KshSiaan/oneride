@@ -16,14 +16,7 @@ import {
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+
 import {
   Dialog,
   DialogContent,
@@ -33,8 +26,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import Image from "next/image";
+import { idk } from "@/lib/utils";
+import { dateExtractor } from "@/lib/func/functions";
 
-export default function EventTable() {
+export default function EventTable({ data }: { data: idk }) {
+  const list = data.result;
+
   const charterRequests = [
     {
       requestId: "CR-1001",
@@ -85,20 +82,17 @@ export default function EventTable() {
 
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
-      case "Pending":
+      case "pending":
         return "bg-yellow-500";
-      case "Approved":
-        return "bg-green-700";
-      case "Rejected":
+      case "rejected":
         return "bg-red-500";
       default:
-        return "bg-gray-500";
+        return "bg-green-500";
     }
   };
 
   return (
     <>
-      {" "}
       <Table className="mt-12!">
         <TableHeader className="bg-secondary">
           <TableRow>
@@ -113,21 +107,19 @@ export default function EventTable() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {charterRequests.map((request, index) => (
-            <TableRow key={index}>
-              <TableCell className="text-center">{request.requestId}</TableCell>
-              <TableCell className="text-center">{request.userName}</TableCell>
+          {list.map((x: idk) => (
+            <TableRow key={x._id}>
+              <TableCell className="text-center">{x._id}</TableCell>
+              <TableCell className="text-center">{x.name}</TableCell>
               <TableCell className="text-center">
-                {request.dateOfJourney}
+                {dateExtractor(x.createdAt)}
               </TableCell>
-              <TableCell className="text-center">{request.origin}</TableCell>
+              <TableCell className="text-center">{x.pickupLocation}</TableCell>
+              <TableCell className="text-center">{x.dropoffLocation}</TableCell>
+              <TableCell className="text-center">{x.passengerCount}</TableCell>
               <TableCell className="text-center">
-                {request.destination}
-              </TableCell>
-              <TableCell className="text-center">{request.passenger}</TableCell>
-              <TableCell className="text-center">
-                <Badge className={getStatusBadgeColor(request.status)}>
-                  {request.status}
+                <Badge className={getStatusBadgeColor(x.status)}>
+                  {x.status}
                 </Badge>
               </TableCell>
               <TableCell className="text-center !space-x-2">
@@ -226,7 +218,7 @@ export default function EventTable() {
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
-                {request.status === "Pending" && (
+                {x.status === "pending" && (
                   <>
                     <Dialog>
                       <DialogTrigger asChild>
@@ -269,32 +261,6 @@ export default function EventTable() {
           ))}
         </TableBody>
       </Table>
-      <div className="w-full flex flex-row justify-between items-center mt-12!">
-        <div className=""></div>
-        <Pagination className="mt-12">
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious href="#" />
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLink href="#">1</PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLink href="#">2</PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLink href="#">3</PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationNext href="#" />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-        {/* <Button variant={"outline"} className="rounded">
-          <FileDownIcon />
-          Export PDF
-        </Button> */}
-      </div>
     </>
   );
 }

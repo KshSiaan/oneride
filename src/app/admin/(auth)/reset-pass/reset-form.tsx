@@ -1,100 +1,155 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import React from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
+
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ArrowRight, Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { resetPasswordApi } from "@/lib/api/auth";
+import { useCookies } from "react-cookie";
 
-// schema with validation
-const formSchema = z
+const resetSchema = z
   .object({
-    newPass: z
-      .string()
-      .min(8, "Password must be at least 8 characters long")
-      .regex(/[A-Z]/, "Must include an uppercase letter")
-      .regex(/[a-z]/, "Must include a lowercase letter")
-      .regex(/[0-9]/, "Must include a number"),
-    confirmPass: z.string(),
+    password: z.string().min(6, "Password must be at least 6 characters"),
+    confirmPassword: z.string().min(6, "Confirm your password"),
   })
-  .refine((data) => data.newPass === data.confirmPass, {
+  .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
-    path: ["confirmPass"],
+    path: ["confirmPassword"],
   });
 
-export default function ResetForm() {
-  const navig = useRouter();
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      newPass: "",
-      confirmPass: "",
+type ResetFormValues = z.infer<typeof resetSchema>;
+
+export default function AdminResetForm() {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [email, setEmail] = useState<string | null>(null);
+  const { push } = useRouter();
+
+  const form = useForm<ResetFormValues>({
+    resolver: zodResolver(resetSchema),
+    defaultValues: { password: "", confirmPassword: "" },
+  });
+  const [cookies] = useCookies(["token"]);
+  const { mutate, isPending } = useMutation({
+    mutationKey: ["admin-reset-password"],
+    mutationFn: (data: {
+      email: string;
+      password: string;
+      confirmPassword: string;
+    }) => {
+      if (!email) return Promise.reject(new Error("Email not found"));
+      return resetPasswordApi(
+        {
+          email,
+          password: data.password,
+          confirmPassword: data.confirmPassword, // now included
+        },
+        cookies.token
+      );
+    },
+
+    onError: (err: any) => {
+      toast.error(err?.message ?? "Something went wrong");
+    },
+    onSuccess: (data: any) => {
+      toast.success(data.message ?? "Password reset successfully");
+      localStorage.removeItem("forgot_mail");
+      push("/admin");
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log("Submitted data:", values);
-    // implement password reset logic here
+  useEffect(() => {
+    const forgot_mail = localStorage.getItem("forgot_mail");
+    if (forgot_mail) {
+      setEmail(forgot_mail);
+    } else {
+      toast.error("Email not found. Please retry the reset flow.");
+      push("/admin/forgot-pass");
+    }
+  }, []);
 
-    navig.push("/admin/dashboard");
-  }
+  const onSubmit = (values: ResetFormValues) => {
+    mutate({
+      email: localStorage.getItem("forgot_mail") ?? "",
+      password: values.password,
+      confirmPassword: values.confirmPassword,
+    });
+  };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="!space-y-4">
-        <FormField
-          control={form.control}
-          name="newPass"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-base font-semibold">
-                New Password
-              </FormLabel>
-              <FormControl>
+    <div className="min-h-screen flex items-center justify-center !p-4">
+      <div className="w-full max-w-md rounded-lg shadow-lg overflow-hidden border">
+        <div className="!p-8">
+          <h1 className="text-2xl font-semibold mb-6 text-center">
+            Reset Admin Password
+          </h1>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="!space-y-6">
+            <div className="!space-y-4">
+              {/* New Password */}
+              <div className="!space-y-2 relative">
+                <Label htmlFor="password">New Password</Label>
                 <Input
-                  type="password"
-                  placeholder="Enter new password"
-                  {...field}
-                  className="bg-secondary"
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  {...form.register("password")}
                 />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="confirmPass"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-base font-semibold">
-                Confirm Password
-              </FormLabel>
-              <FormControl>
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+                <p className="text-red-500 text-sm mt-1">
+                  {form.formState.errors.password?.message}
+                </p>
+              </div>
+
+              {/* Confirm Password */}
+              <div className="!space-y-2 relative">
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
                 <Input
-                  type="password"
-                  placeholder="Re-enter new password"
-                  {...field}
-                  className="bg-secondary"
+                  id="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  {...form.register("confirmPassword")}
                 />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button className="w-full !mt-12" type="submit">
-          Reset Password
-        </Button>
-      </form>
-    </Form>
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff size={20} />
+                  ) : (
+                    <Eye size={20} />
+                  )}
+                </button>
+                <p className="text-red-500 text-sm mt-1">
+                  {form.formState.errors.confirmPassword?.message}
+                </p>
+              </div>
+            </div>
+
+            <Button type="submit" className="w-full" disabled={isPending}>
+              {isPending ? (
+                "Resetting..."
+              ) : (
+                <>
+                  <span>Reset Password</span> <ArrowRight />
+                </>
+              )}
+            </Button>
+          </form>
+        </div>
+      </div>
+    </div>
   );
 }

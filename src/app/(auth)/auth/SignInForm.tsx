@@ -36,8 +36,8 @@ type SignInFormValues = z.infer<typeof signInSchema>;
 
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
-  const [,setCookie] = useCookies(["token"])
-  const {push} = useRouter()
+  const [, setCookie] = useCookies(["token"]);
+  const { push } = useRouter();
   const { mutate } = useMutation({
     mutationKey: ["login"],
     mutationFn: (data: { email: string; password: string }) => {
@@ -59,10 +59,11 @@ export default function SignInForm() {
         toast.error(err?.message ?? "Something went wrong..");
       },
       onSuccess: (data: idk) => {
-        setCookie("token",data.data.token);
+        console.log(data);
+        setCookie("token", data.data.token);
         toast.success(data.message ?? "");
         form.reset();
-        push("/")
+        push("/");
         console.log(data);
       },
     });

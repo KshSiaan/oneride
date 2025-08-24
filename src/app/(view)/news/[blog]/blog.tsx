@@ -3,6 +3,11 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, User } from "lucide-react";
 import { getBlogByIdApi } from "@/lib/api/core";
 import { idk } from "@/lib/utils";
+import Image from "next/image";
+import { blankImg } from "@/lib/config";
+import { imgCreator } from "@/lib/func/functions";
+
+import SafeComponent from "./safe-content";
 export default async function Blog({ id }: { id: string }) {
   const call: idk = await getBlogByIdApi(id);
 
@@ -48,14 +53,18 @@ export default async function Blog({ id }: { id: string }) {
             </div>
           </div>
         </div>
-
+        <Image
+          src={info.thumbnail ? imgCreator(info.thumbnail) : blankImg}
+          height={500}
+          width={500}
+          alt="thumbnail"
+          className="w-full aspect-video bg-red-200 object-cover"
+        ></Image>
         <h1 className="text-4xl lg:text-6xl font-bold leading-tight mb-6">
           {info.title}
         </h1>
 
-        <article className="text-xl text-muted-foreground leading-relaxed max-w-3xl">
-          {info.content}
-        </article>
+        <SafeComponent data={info.content} />
       </div>
     </div>
   );

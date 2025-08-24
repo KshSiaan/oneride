@@ -18,12 +18,14 @@ export default async function Events() {
       description: string;
       startDate: string;
       startTime: string;
+      image: string;
     }) => (
       <EventCard
         title={x.title}
         location={x.description}
         key={x._id}
         id={x._id}
+        image={x.image}
         startDate={dateExtractor(x.startDate)}
         startTime={timeExtractor(x.startTime)}
       />

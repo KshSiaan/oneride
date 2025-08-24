@@ -1,4 +1,5 @@
 
+import { base_api } from "../config"
 import { howl } from "../utils"
 
 // >>>>>>>>>>> Category <<<<<<<<<<<<<
@@ -15,26 +16,82 @@ export const deleteCategoryApi = async (id: string, token: string) => {
     return howl(`/categories/${id}`, { method: "DELETE", token })
 }
 
-export const getCategoriesApi = async (token: string) => {
-    return howl("/categories", { method: "GET", token })
+export const getCategoriesApi = async () => {
+    return howl("/categories", { method: "GET" })
 }
 
 // >>>>>>>>>>> Blog <<<<<<<<<<<<<
 
 export const addBlogApi = async (
-    body: { title: string; author: string; status: string; content: string },
-    token: string
+  body: {
+    title: string;
+    author: string;
+    status: string;
+    content: string;
+    image: File | null;
+  },
+  token: string
 ) => {
-    return howl("/blogs", { method: "POST", body, token })
-}
+  const formData = new FormData();
+  formData.append("title", body.title);
+  formData.append("author", body.author);
+  formData.append("status", body.status);
+  formData.append("content", body.content);
+  if (body.image) {
+    formData.append("image", body.image);
+  }
+
+  const res = await fetch(`${base_api}/blogs`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`, // ✅ don't set Content-Type, browser handles it
+    },
+    body: formData,
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to add blog: ${res.statusText}`);
+  }
+
+  return res.json();
+};
+
 
 export const editBlogApi = async (
-    id: string,
-    body: { title: string; author: string; status: string; content: string },
-    token: string
+  id: string,
+  body: {
+    title: string;
+    author: string;
+    status: string;
+    content: string;
+    image?: File | null;
+  },
+  token: string
 ) => {
-    return howl(`/blogs/${id}`, { method: "PUT", body, token })
-}
+  const formData = new FormData();
+  formData.append("title", body.title);
+  formData.append("author", body.author);
+  formData.append("status", body.status);
+  formData.append("content", body.content);
+  if (body.image) {
+    formData.append("image", body.image);
+  }
+
+  const res = await fetch(`${base_api}/blogs/${id}`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`, // ✅ don't set Content-Type
+    },
+    body: formData,
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to edit blog: ${res.statusText}`);
+  }
+
+  return res.json();
+};
+
 
 export const deleteBlogApi = async (id: string, token: string) => {
     return howl(`/blogs/${id}`, { method: "DELETE", token })
@@ -42,6 +99,10 @@ export const deleteBlogApi = async (id: string, token: string) => {
 
 export const getBlogsApi = async (token: string) => {
     return howl("/blogs", { method: "GET", token })
+}
+
+export const getBlogsAdminApi = async (page:number,status:string,token: string) => {
+    return howl(`/blogs?status=${status}&currentPage=${page}`, { method: "GET", token })
 }
 
 export const getBlogByIdApi = async (id: string) => {
@@ -176,11 +237,29 @@ export const deleteEventApi = async (id: string, token: string) => {
     return howl(`/events/${id}`, { method: "DELETE", token })
 }
 
+type GetEventsParams = {
+  category?: string;
+  title?: string;
+  adminStatus?: string;
+  filterByQuarter?: string;
+  id?: string;
+};
+
 export const getEventsApi = async (
-    token: string
+  token: string,
+  params?: GetEventsParams
 ) => {
-    return howl(`/events`, {token })
-}
+  const query = params
+    ? '?' +
+      Object.entries(params)
+        .filter(([, value]) => value !== undefined && value !== '')
+        .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+        .join('&')
+    : '';
+
+  return howl(`/events${query}`, { token });
+};
+
 
 // >>>>>>>>>>> Charter <<<<<<<<<<<<<
 
@@ -280,14 +359,14 @@ export const createBookingGuestApi = async (
 
 export const getBookingsApi = async (
     params: { filterByQuarter?: string; name?: string; status?: string } = {},
-    token: string
+
 ) => {
     const query = new URLSearchParams()
     if (params.filterByQuarter) query.append("filterByQuarter", params.filterByQuarter)
     if (params.name) query.append("name", params.name)
     if (params.status) query.append("status", params.status)
 
-    return howl(`/bookings?${query.toString()}`, { method: "GET", token })
+    return howl(`/bookings?${query.toString()}`, { method: "GET"})
 }
 
 export const getBookingByIdApi = async (id: string, token: string) => {
@@ -355,8 +434,20 @@ export const getOwnProfileApi = async (token: string) => {
 }
 
 export const updateUserProfileApi = async (body: FormData, token: string) => {
-    return howl("/users/auth/update-profile-by-user", { method: "PATCH", body, token })
-}
+  const res = await fetch(`${base_api}/users/auth/update-profile-by-user`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body,
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to update profile: ${res.statusText}`);
+  }
+
+  return res.json();
+};
 
 export const toggleUserBanApi = async (body: { userId: string }, token: string) => {
     return howl("/users/auth/toggle-ban", { method: "PATCH", body, token })

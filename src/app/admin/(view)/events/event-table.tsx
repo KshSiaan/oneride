@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import {
   Table,
@@ -8,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { EditIcon, FileDownIcon, TrashIcon, Users2Icon } from "lucide-react";
+import { EditIcon, TrashIcon, Users2Icon } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -16,144 +17,46 @@ import {
 } from "@/components/ui/popover";
 import { CardDescription } from "@/components/ui/card";
 import { PopoverArrow, PopoverClose } from "@radix-ui/react-popover";
-
 import { Badge } from "@/components/ui/badge";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 import Link from "next/link";
+import { idk } from "@/lib/utils";
+import { dateExtractor, timeExtractor } from "@/lib/func/functions";
 
-export default function EventTable() {
-  const customers = [
-    {
-      title: "Music Festival",
-      date: (
-        <>
-          15 Jun 2025 <br />
-          6:00 PM
-        </>
-      ),
-      location: (
-        <>
-          Wellington, <br />
-          Waterfont
-        </>
-      ),
-      cat: "Food Fair",
-      total: 120,
-      booked: 98,
-      status: "Active",
-    },
-    {
-      title: "Music Festival",
-      date: (
-        <>
-          15 Jun 2025 <br />
-          6:00 PM
-        </>
-      ),
-      location: (
-        <>
-          Wellington, <br />
-          Waterfont
-        </>
-      ),
-      cat: "Food Fair",
-      total: 120,
-      booked: 98,
-      status: "Active",
-    },
-    {
-      title: "Music Festival",
-      date: (
-        <>
-          15 Jun 2025 <br />
-          6:00 PM
-        </>
-      ),
-      location: (
-        <>
-          Wellington, <br />
-          Waterfont
-        </>
-      ),
-      cat: "Food Fair",
-      total: 120,
-      booked: 98,
-      status: "Active",
-    },
-    {
-      title: "Music Festival",
-      date: (
-        <>
-          15 Jun 2025 <br />
-          6:00 PM
-        </>
-      ),
-      location: (
-        <>
-          Wellington, <br />
-          Waterfont
-        </>
-      ),
-      cat: "Food Fair",
-      total: 120,
-      booked: 98,
-      status: "Active",
-    },
-    {
-      title: "Music Festival",
-      date: (
-        <>
-          15 Jun 2025 <br />
-          6:00 PM
-        </>
-      ),
-      location: (
-        <>
-          Wellington, <br />
-          Waterfont
-        </>
-      ),
-      cat: "Food Fair",
-      total: 120,
-      booked: 98,
-      status: "Active",
-    },
-  ];
-
+export default function EventTable({ data }: { data: idk }) {
+  console.log(data.data);
+  const customers = data.data;
   return (
     <>
-      {" "}
       <Table className="mt-12!">
         <TableHeader className="bg-secondary">
           <TableRow>
             <TableHead className="text-center">Event Title</TableHead>
             <TableHead className="text-center">Date & Time</TableHead>
-            <TableHead className="text-center">Location</TableHead>
+            {/* <TableHead className="text-center">Location</TableHead> */}
             <TableHead className="text-center">Category</TableHead>
             <TableHead className="text-center">Total seats</TableHead>
-            <TableHead className="text-center">Booked seats</TableHead>
+            <TableHead className="text-center">Ticket Price</TableHead>
             <TableHead className="text-center">Status</TableHead>
             <TableHead className="text-center">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {customers.map((x, index) => (
-            <TableRow key={index}>
-              <TableCell className="">{x.title}</TableCell>
-              <TableCell className="">{x.date}</TableCell>
-              <TableCell className="">{x.location}</TableCell>
-              <TableCell className="">{x.cat}</TableCell>
-              <TableCell className="">{x.total}</TableCell>
-              <TableCell className="">{x.booked}</TableCell>
-              <TableCell className="">
-                <Badge className="bg-green-700">{x.status}</Badge>
+          {customers.map((x: idk) => (
+            <TableRow key={x._id}>
+              <TableCell className="text-center">{x.title}</TableCell>
+              <TableCell className="text-center">
+                {dateExtractor(x.startDate)} at {timeExtractor(x.startTime)}
+              </TableCell>
+              {/* <TableCell className="">{x.location}</TableCell> */}
+              <TableCell className="text-center capitalize">
+                {x?.category?.name}
+              </TableCell>
+              <TableCell className="text-center">{x.totalSeat}</TableCell>
+              <TableCell className="text-center">{x.ticketPrice}</TableCell>
+              <TableCell className=" text-center">
+                <Badge className="bg-green-700 capitalize">
+                  {x.adminStatus}
+                </Badge>
               </TableCell>
               <TableCell className="text-center !space-x-2">
                 <Button variant="ghost" size="icon" asChild>
@@ -195,7 +98,7 @@ export default function EventTable() {
           ))}
         </TableBody>
       </Table>
-      <div className="w-full flex flex-row justify-between items-center mt-12!">
+      {/* <div className="w-full flex flex-row justify-between items-center mt-12!">
         <div className=""></div>
         <Pagination className="mt-12">
           <PaginationContent>
@@ -220,7 +123,7 @@ export default function EventTable() {
           <FileDownIcon />
           Export PDF
         </Button>
-      </div>
+      </div> */}
     </>
   );
 }

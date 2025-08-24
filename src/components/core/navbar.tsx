@@ -16,21 +16,25 @@ import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { getOwnProfileApi } from "@/lib/api/core";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { idk } from "@/lib/utils";
+
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { idk } from "@/lib/utils";
 
 export default function ResponsiveNavbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [cookies, , removeCookie] = useCookies(["token"]);
-  const [isClient, setIsClient] = useState(false); // ✅ client-only flag
+  const [isClient, setIsClient] = useState(false);
   const { push } = useRouter();
-  const { data, isPending, isSuccess }: idk = useQuery({
+  const token = cookies?.token;
+
+  const { data, isPending, isError, error }: idk = useQuery({
     queryKey: ["user"],
-    queryFn: () => {
-      return getOwnProfileApi(cookies.token);
-    },
-    enabled: !!cookies.token,
+    queryFn: () => getOwnProfileApi(token),
+    enabled: !!token, // only run if token exists
   });
+
+  if (isError) console.error(error);
+
   useEffect(() => {
     setIsClient(true); // run only on client
   }, []);
@@ -80,14 +84,18 @@ export default function ResponsiveNavbar() {
           <div className="hidden lg:flex flex-1 justify-center gap-2 font-serif">
             <NavigationButtons />
           </div>
-
+          {status}
           {/* Right: User / Menu */}
           <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
-            {isPending ? (
+            {!token ? (
+              <Button asChild className="rounded-sm text-foreground">
+                <Link href="/auth">Log in</Link>
+              </Button>
+            ) : isPending ? (
               <div className="h-12 aspect-video flex items-center justify-center">
                 <Loader2Icon className="animate-spin" />
               </div>
-            ) : !isSuccess ? (
+            ) : isError ? (
               <Button asChild className="rounded-sm text-foreground">
                 <Link href="/auth">Log in</Link>
               </Button>

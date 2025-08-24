@@ -43,7 +43,7 @@ export default function LogoutPage() {
           <CardContent className="space-y-4">
             {/* Action Buttons */}
             <div className="flex flex-col gap-3">
-              <LogoutButton text="Log Out" />
+              <LogoutButton>Log Out</LogoutButton>
 
               <Button
                 variant="outline"

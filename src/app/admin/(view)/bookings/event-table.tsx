@@ -27,20 +27,10 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import Link from "next/link";
+import { cn, idk } from "@/lib/utils";
+import { dateExtractor } from "@/lib/func/functions";
 
-export default function EventTable() {
-  const customers = [
-    {
-      id: "BK-1001",
-      event: "Music Festival",
-      user: "John smith",
-      seats: 2,
-      date: "Jun 15, 2025",
-      payment: "Paid",
-      status: "Confirmed",
-    },
-  ];
-
+export default function EventTable({ data }: idk) {
   return (
     <>
       {" "}
@@ -49,7 +39,7 @@ export default function EventTable() {
           <TableRow>
             <TableHead className="text-center">Booking ID</TableHead>
             <TableHead className="text-center">Event Name</TableHead>
-            <TableHead className="text-center">User Name</TableHead>
+            {/* <TableHead className="text-center">User Name</TableHead> */}
             <TableHead className="text-center">Seats Booked</TableHead>
             <TableHead className="text-center">Booking Date</TableHead>
             <TableHead className="text-center">Payment status</TableHead>
@@ -58,22 +48,36 @@ export default function EventTable() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {customers.map((x, index) => (
-            <TableRow key={index}>
-              <TableCell className="text-center">{x.id}</TableCell>
-              <TableCell className="text-center">{x.event}</TableCell>
-              <TableCell className="text-center">{x.user}</TableCell>
-              <TableCell className="text-center">{x.seats}</TableCell>
-              <TableCell className="text-center">{x.date}</TableCell>
+          {data?.data?.map((x: idk) => (
+            <TableRow key={x._id}>
+              <TableCell className="text-center">{x._id}</TableCell>
+              <TableCell className="text-center">{x.event.title}</TableCell>
+              {/* <TableCell className="text-center">{x.}</TableCell> */}
+              <TableCell className="text-center">{x.ticketCount}</TableCell>
               <TableCell className="text-center">
-                <Badge className="bg-green-700"> {x.payment}</Badge>
+                {dateExtractor(x.updatedAt)}
               </TableCell>
               <TableCell className="text-center">
-                <Badge className="bg-green-700">{x.status}</Badge>
+                <Badge
+                  className={cn(
+                    x.paid ? "bg-green-700" : "bg-secondary text-foreground"
+                  )}
+                >
+                  {x.paid ? "Paid" : "Unpaid"}
+                </Badge>
+              </TableCell>
+              <TableCell className="text-center">
+                <Badge
+                  className={cn(
+                    x.status === "pending" ? "bg-yellow-400" : "bg-green-700"
+                  )}
+                >
+                  {x.status}
+                </Badge>
               </TableCell>
               <TableCell className="text-center !space-x-2">
                 <Button variant="ghost" size="icon" asChild>
-                  <Link href={"bookings/details"}>
+                  <Link href={`bookings/${x._id}`}>
                     <EyeIcon />
                   </Link>
                 </Button>

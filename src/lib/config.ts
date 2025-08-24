@@ -12,3 +12,5 @@ export const apiConfig = {
   base:base_server,
   isDevelopment: onDev,
 }; 
+
+export const  blankImg = "https://placehold.co/500x500/png"

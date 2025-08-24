@@ -21,6 +21,8 @@ const badgeVariants = cva(
           "bg-[#FEF2F2] border-transparent text-primary [a&]:hover:bg-primary/90",
         provider:
           "bg-[#F1FCF2] border-transparent text-primary [a&]:hover:bg-primary/90",
+        success:
+          "bg-green-500 border-green-700 text-foreground hover:bg-green-600/80",
       },
     },
     defaultVariants: {
