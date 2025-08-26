@@ -31,12 +31,12 @@ export default function Page() {
   const [cookies] = useCookies(["token"]);
   const [page, setPage] = useState(1);
   const { data, isPending } = useQuery({
-    queryKey: ["charter"],
+    queryKey: ["charter", search, selectedStatus, selectedDate],
     queryFn: (): idk => {
       return getChartersApi(
         {
           name: search,
-          status: selectedStatus,
+          status: selectedStatus === "all" ? "" : selectedStatus,
           filterByQuarter: selectedDate,
           page: page,
           limit: 12,
@@ -76,7 +76,11 @@ export default function Page() {
             <SelectValue placeholder="All Status" />
           </SelectTrigger>
           <SelectContent>
-            {["active", "draft", "ended"].map((x) => (
+            <SelectItem value="all" className="capitalize">
+              All
+            </SelectItem>
+
+            {["pending", "rejected", "approved"].map((x) => (
               <SelectItem key={x} value={x} className="capitalize">
                 {x}
               </SelectItem>

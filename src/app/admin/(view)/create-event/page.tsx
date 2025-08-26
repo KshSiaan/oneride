@@ -30,42 +30,88 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import LocationPicker from "@/components/core/location-picker";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import Image from "next/image";
 
 const formSchema = z.object({
-  eventTitle: z.string().min(1, "Event title is required"),
+  title: z.string().min(1, "Event title is required"),
   category: z.string().min(1, "Category is required"),
   description: z.string().min(1, "Description is required"),
   startDate: z.string().min(1, "Start date is required"),
   endDate: z.string().min(1, "End date is required"),
   startTime: z.string().min(1, "Start time is required"),
   endTime: z.string().min(1, "End time is required"),
-  venueName: z.string().min(1, "Venue name is required"),
+
+  pickup: z.object({
+    address: z.string().min(1, "Pickup required"),
+    lat: z.string().optional(),
+    lng: z.string().optional(),
+  }),
+  park: z.object({
+    address: z.string().min(1, "Park required"),
+    lat: z.string().optional(),
+    lng: z.string().optional(),
+  }),
+  venue: z.object({
+    address: z.string().min(1, "Venue required"),
+    lat: z.string().optional(),
+    lng: z.string().optional(),
+  }),
+
+  image: z.any().optional(),
+
   totalSeats: z.string().min(1, "Total seats is required"),
   ticketPrice: z.string().min(1, "Ticket price is required"),
   eventStatus: z.string().min(1, "Event status is required"),
 });
 
+// interface LocationData {
+//   lat: number;
+//   lng: number;
+//   address?: string;
+// }
+
 export default function CreateEventPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      eventTitle: "",
+      title: "",
       category: "",
       description: "",
       startDate: "",
       endDate: "",
       startTime: "",
       endTime: "",
-      venueName: "",
+      pickup: {
+        address: "",
+        lat: "",
+        lng: "",
+      },
+      park: {
+        address: "",
+        lat: "",
+        lng: "",
+      },
+      venue: {
+        address: "",
+        lat: "",
+        lng: "",
+      },
       totalSeats: "",
       ticketPrice: "",
       eventStatus: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-  }
+  const onSubmit = (data: z.infer<typeof formSchema>) => {
+    console.log("Submitted:", data);
+  };
 
   function onSaveDraft() {
     console.log("Saving as draft...");
@@ -81,9 +127,7 @@ export default function CreateEventPage() {
         {/* Header */}
         <div className="mb-8!">
           <h1 className="text-3xl font-bold mb-2!">Create New Event</h1>
-          <p className="">
-            Fill out the form below to create a new transportation event
-          </p>
+          <p>Fill out the form below to create a new transportation event</p>
         </div>
 
         <Form {...form}>
@@ -100,7 +144,7 @@ export default function CreateEventPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
-                  name="eventTitle"
+                  name="title"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-white">
@@ -109,7 +153,6 @@ export default function CreateEventPage() {
                       <FormControl>
                         <Input
                           placeholder="eg. Shuttle service add new line"
-                          className=" "
                           {...field}
                         />
                       </FormControl>
@@ -133,7 +176,7 @@ export default function CreateEventPage() {
                             <SelectValue placeholder="Select category" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent className="">
+                        <SelectContent>
                           <SelectItem value="shuttle">
                             Shuttle Service
                           </SelectItem>
@@ -183,7 +226,7 @@ export default function CreateEventPage() {
                     <FormItem>
                       <FormLabel className="text-white">Start Date *</FormLabel>
                       <FormControl>
-                        <Input type="date" className="" {...field} />
+                        <Input type="date" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -197,7 +240,7 @@ export default function CreateEventPage() {
                     <FormItem>
                       <FormLabel className="text-white">End Date *</FormLabel>
                       <FormControl>
-                        <Input type="date" className="" {...field} />
+                        <Input type="date" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -211,7 +254,7 @@ export default function CreateEventPage() {
                     <FormItem>
                       <FormLabel className="text-white">Start Time *</FormLabel>
                       <FormControl>
-                        <Input type="time" className="" {...field} />
+                        <Input type="time" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -225,7 +268,7 @@ export default function CreateEventPage() {
                     <FormItem>
                       <FormLabel className="text-white">End Time *</FormLabel>
                       <FormControl>
-                        <Input type="time" className="" {...field} />
+                        <Input type="time" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -243,35 +286,140 @@ export default function CreateEventPage() {
                 </h2>
               </div>
 
-              <FormField
-                control={form.control}
-                name="venueName"
-                render={({ field }) => (
-                  <FormItem className="mb-6!">
-                    <FormLabel className="text-white">Venue Name *</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="eg. Wellington central market"
-                        className=""
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div>
-                <h3 className="mb-4!">Map Location</h3>
-                <div className=" rounded-lg flex items-center justify-center">
-                  <iframe
-                    width="1200"
-                    height="650"
-                    loading="lazy"
-                    className="border-0 w-[80dvw] mx-auto! block mt-12! h-[50dvh] col-span-2 grayscale brightness-[70%]"
-                    src="https://www.google.com/maps/embed/v1/search?q=Murfreesboro&key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8"
-                  ></iframe>
+              {/* Pickup */}
+              <div className="mb-4">
+                <h3 className="mb-4!">Select Pickup Point</h3>
+                <div className="grid grid-cols-6 gap-6">
+                  <div className="col-span-5">
+                    <FormField
+                      control={form.control}
+                      name="pickup.address"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <LocationPicker
+                              onLocationSelect={(locationData) => {
+                                if (locationData) {
+                                  field.onChange(locationData.address || "");
+                                  form.setValue(
+                                    "pickup.lat",
+                                    String(locationData.lat)
+                                  );
+                                  form.setValue(
+                                    "pickup.lng",
+                                    String(locationData.lng)
+                                  );
+                                }
+                              }}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  {/* Keep dropdown untouched */}
+                  <div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          className="w-full h-full flex justify-center items-center"
+                          variant={"default"}
+                          type="button"
+                        >
+                          Select from saved
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        className="w-[30dvw] bg-background"
+                        side="bottom"
+                        align="end"
+                      >
+                        <DropdownMenuItem className="w-full flex-col">
+                          <p className="w-full text-lg">
+                            43 Mohakhali C/A, Dhaka 1212, Bangladesh
+                          </p>
+                          <div className="w-full grid grid-cols-2 gap-2 text-muted-foreground">
+                            <p>Lat:12.870798</p>
+                            <p>Long:-45.987234</p>
+                          </div>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="w-full flex-col">
+                          <p className="w-full text-lg">
+                            Banasree C Block Avenue Road, Dhaka Ave 3, Dhaka,
+                            Bangladesh
+                          </p>
+                          <div className="w-full grid grid-cols-2 gap-2 text-muted-foreground">
+                            <p>Lat:23.758739</p>
+                            <p>Long:90.428947</p>
+                          </div>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </div>
+              </div>
+
+              {/* Park */}
+              <div className="mb-4">
+                <h3 className="mb-4!">Select Park & Ride Point</h3>
+                <FormField
+                  control={form.control}
+                  name="park.address"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <LocationPicker
+                          onLocationSelect={(locationData) => {
+                            if (locationData) {
+                              field.onChange(locationData.address || "");
+                              form.setValue(
+                                "park.lat",
+                                String(locationData.lat)
+                              );
+                              form.setValue(
+                                "park.lng",
+                                String(locationData.lng)
+                              );
+                            }
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Venue */}
+              <div className="mb-4">
+                <h3 className="mb-4!">Select Venue</h3>
+                <FormField
+                  control={form.control}
+                  name="venue.address"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <LocationPicker
+                          onLocationSelect={(locationData) => {
+                            if (locationData) {
+                              field.onChange(locationData.address || "");
+                              form.setValue(
+                                "venue.lat",
+                                String(locationData.lat)
+                              );
+                              form.setValue(
+                                "venue.lng",
+                                String(locationData.lng)
+                              );
+                            }
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
             </div>
 
@@ -292,7 +440,7 @@ export default function CreateEventPage() {
                     <FormItem>
                       <FormLabel className="text-white">Total seat *</FormLabel>
                       <FormControl>
-                        <Input placeholder="eg. 10" className="" {...field} />
+                        <Input placeholder="eg. 10" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -308,7 +456,7 @@ export default function CreateEventPage() {
                         Ticket Price (NZD) *
                       </FormLabel>
                       <FormControl>
-                        <Input placeholder="eg. $25" className="" {...field} />
+                        <Input placeholder="eg. $25" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -328,9 +476,19 @@ export default function CreateEventPage() {
 
               <div className="border-2 border-dashed border-zinc-700 rounded-lg p-12! text-center">
                 <div className="flex flex-col items-center gap-4">
-                  <div className="w-12 h-12 rounded-lg flex items-center justify-center">
-                    <ImageIcon className="w-6 h-6 " />
-                  </div>
+                  {form.getValues("image") ? (
+                    <div className="w-full aspect-video rounded-lg flex items-center justify-center">
+                      <Image
+                        src={form.getValues("image")}
+                        fill
+                        alt="thumbnail"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-12 h-12 rounded-lg flex items-center justify-center">
+                      <ImageIcon className="w-6 h-6 " />
+                    </div>
+                  )}
                   <div>
                     <p className="text-white mb-1!">
                       Drag & drop your event image here
@@ -339,12 +497,24 @@ export default function CreateEventPage() {
                       or click to browse files (JPEG, PNG, max 5MB)
                     </p>
                   </div>
-                  <Button
-                    type="button"
-                    className="bg-pink-500 hover:bg-pink-600 text-white"
-                  >
-                    BROWSE FILES
-                  </Button>
+                  <FormField
+                    control={form.control}
+                    name="image"
+                    render={({ field }) => (
+                      <FormItem className="w-full">
+                        <FormControl>
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) =>
+                              field.onChange(e.target.files?.[0])
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
               </div>
             </div>
@@ -371,7 +541,7 @@ export default function CreateEventPage() {
                           <SelectValue placeholder="Upcoming" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent className="">
+                      <SelectContent>
                         <SelectItem value="upcoming">Upcoming</SelectItem>
                         <SelectItem value="active">Active</SelectItem>
                         <SelectItem value="completed">Completed</SelectItem>

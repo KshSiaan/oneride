@@ -10,10 +10,13 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const token = (await cookies()).get("token")?.value;
-  const user: idk = await getOwnProfileApi(token ?? "");
+  let user: idk;
+  if (token) {
+    user = await getOwnProfileApi(token ?? "");
+  }
 
   if (user) {
-    if (user.data.roles.includes("admin")) {
+    if (user?.data?.roles.includes("admin")) {
       redirect("/admin/dashboard");
     } else {
       return notFound();

@@ -1,23 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-// import {
-//   CategoriesIcon,
-//   DashboardIcon,
-//   ProductListingIcon,
-//   SettingIcon,
-//   SubscriptionIcon,
-//   UsersIcon,
-//   WithdrawIcon,
-// } from "./localIcons";
 import { useRouter, usePathname } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import { Button } from "../ui/button";
-import { cn } from "@/lib/utils";
+import { cn, idk } from "@/lib/utils";
 import Image from "next/image";
 import {
   LayoutDashboardIcon,
   CalendarCheckIcon,
-  // TicketIcon,
   LayoutGridIcon,
   BookmarkIcon,
   UsersIcon,
@@ -28,6 +18,7 @@ import {
   ChevronRight,
   BookCopyIcon,
   ContactRoundIcon,
+  Loader2Icon,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import {
@@ -41,12 +32,23 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useQuery } from "@tanstack/react-query";
+import { getOwnProfileApi } from "@/lib/api/core";
+import { useCookies } from "react-cookie";
+import { imgCreator } from "@/lib/func/functions";
 
 export default function AdminSideMenu() {
   const router = useRouter();
   const pathname = usePathname();
+  const [cookies] = useCookies(["token"]);
   const [current, setCurrent] = useState("dashboard");
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
+  const { data, isPending } = useQuery({
+    queryKey: ["user"],
+    queryFn: (): idk => {
+      return getOwnProfileApi(cookies.token);
+    },
+  });
 
   useEffect(() => {
     const pathParts = pathname.split("/");
@@ -218,14 +220,32 @@ export default function AdminSideMenu() {
         <div className="flex-1 flex justify-end items-end w-full">
           <div className="w-full rounded-lg font-sans flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Avatar>
-                <AvatarImage src={"https://avatar.iran.liara.run/public"} />
-                <AvatarFallback>UI</AvatarFallback>
-              </Avatar>
-              <div className="flex flex-col justify-start items-start gap-0">
-                <h5 className="">Admin</h5>
-                <p className="text-sm font-light">admin.holt@example.com</p>
-              </div>
+              {isPending ? (
+                <div
+                  className={`flex justify-center items-center h-24 mx-auto`}
+                >
+                  <Loader2Icon className={`animate-spin`} />
+                </div>
+              ) : (
+                <>
+                  <Avatar>
+                    <AvatarImage
+                      src={
+                        data.data.image
+                          ? imgCreator(data.data.image)
+                          : "https://avatar.iran.liara.run/public"
+                      }
+                    />
+                    <AvatarFallback>UI</AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col justify-start items-start gap-0">
+                    <h5 className="">{data.data.name ?? "Admin"}</h5>
+                    <p className="text-sm font-light">
+                      {data.data.email ?? "admin@email.com"}
+                    </p>
+                  </div>
+                </>
+              )}
             </div>
             <AlertDialog>
               <AlertDialogTrigger asChild>

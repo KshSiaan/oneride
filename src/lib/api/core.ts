@@ -112,19 +112,85 @@ export const getBlogByIdApi = async (id: string) => {
 // >>>>>>>>>>> Ally <<<<<<<<<<<<<
 
 export const addAllyApi = async (
-    body: { name: string; location: string; type: string; status: string; websiteURL: string; marketingBlurb: string },
-    token: string
+  body: {
+    name: string;
+    location: string;
+    type: 'pub'|'restaurant'|'venue';
+    status: 'active'| 'inactive';
+    websiteURL: string;
+    marketingBlurb: string;
+    image?: File | null; // in case you’ll need file upload later
+  },
+  token: string
 ) => {
-    return howl("/allies", { method: "POST", body, token })
-}
+  const formData = new FormData();
+  formData.append("name", body.name);
+  formData.append("location", body.location);
+  formData.append("type", body.type);
+  formData.append("status", body.status);
+  formData.append("websiteURL", body.websiteURL);
+  formData.append("marketingBlurb", body.marketingBlurb);
+
+  if (body.image) {
+    formData.append("image", body.image);
+  }
+
+  const res = await fetch(`${base_api}/allies`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`, // don’t set Content-Type with FormData
+    },
+    body: formData,
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to add ally: ${res.statusText}`);
+  }
+
+  return res.json();
+};
+
 
 export const editAllyApi = async (
-    id: string,
-    body: { name: string; location: string; type: string; status: string; websiteURL: string; marketingBlurb: string },
-    token: string
+  id: string,
+  body: {
+    name: string;
+    location: string;
+    type: string;
+    status: string;
+    websiteURL: string;
+    marketingBlurb: string;
+    image?: File | null; // optional, in case you allow updating image
+  },
+  token: string
 ) => {
-    return howl(`/allies/${id}`, { method: "PUT", body, token })
-}
+  const formData = new FormData();
+  formData.append("name", body.name);
+  formData.append("location", body.location);
+  formData.append("type", body.type);
+  formData.append("status", body.status);
+  formData.append("websiteURL", body.websiteURL);
+  formData.append("marketingBlurb", body.marketingBlurb);
+
+  if (body.image) {
+    formData.append("image", body.image);
+  }
+
+  const res = await fetch(`${base_api}/allies/${id}`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`, // don’t manually set Content-Type
+    },
+    body: formData,
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to edit ally: ${res.statusText}`);
+  }
+
+  return res.json();
+};
+
 
 export const deleteAllyApi = async (id: string, token: string) => {
     return howl(`/allies/${id}`, { method: "DELETE", token })
@@ -132,9 +198,8 @@ export const deleteAllyApi = async (id: string, token: string) => {
 
 export const getAlliesApi = async (
     {page }: { page: number },
-    token: string
 ) => {
-    return howl(`/allies?page=${page}&limit=12`, { method: "GET", token })
+    return howl(`/allies?page=${page}&limit=12`, { method: "GET", })
 }
 
 // >>>>>>>>>>> Partnership <<<<<<<<<<<<<
@@ -166,21 +231,35 @@ export const getPartnershipByIdApi = async (id: string, token: string) => {
 }
 
 export const getPartnershipsApi = async (
-    {
-        status,
-        includeStats,
-        search,
-        page,
-        limit,
-        dateFilter,
-    }: { status?: string; includeStats?: boolean; search?: string; page: number; limit: number; dateFilter?: string },
-    token: string
+  {
+    status,
+    includeStats,
+    search,
+    page,
+    limit,
+    dateFilter,
+  }: {
+    status?: string;
+    includeStats?: boolean;
+    search?: string;
+    page?: number;
+    limit?: number;
+    dateFilter?: string;
+  } = {},
+  token: string
 ) => {
-    return howl(
-        `/partnerships?status=${status ?? ""}&includeStats=${includeStats ?? ""}&search=${search ?? ""}&page=${page}&limit=${limit}&dateFilter=${dateFilter ?? ""}`,
-        { method: "GET", token }
-    )
-}
+  const query = new URLSearchParams({
+    ...(status && { status }),
+    ...(includeStats !== undefined && { includeStats: String(includeStats) }),
+    ...(search && { search }),
+    ...(page !== undefined && { page: String(page) }),
+    ...(limit !== undefined && { limit: String(limit) }),
+    ...(dateFilter && { dateFilter }),
+  });
+
+  return howl(`/partnerships?${query.toString()}`, { method: "GET", token });
+};
+
 
 // >>>>>>>>>>> About Us <<<<<<<<<<<<<
 
@@ -282,20 +361,10 @@ export const createCharterApi = async (
 
 export const updateCharterStatusApi = async (
     id: string,
-    body: {
-        name: string
-        email: string
-        phone: string
-        passengerCount: number
-        pickupLocation: string
-        dropoffLocation: string
-        pickupDateAndTime: string
-        purpose: string
-        specialInstructions: string
-    },
+    status:"pending"|"approved"|"rejected",
     token: string
 ) => {
-    return howl(`/charters/status/${id}`, { method: "PATCH", body, token })
+    return howl(`/charters/status/${id}`, { method: "PATCH", body:{status}, token })
 }
 
 export const mailCharterUserApi = async (id: string, body: object = {}, token: string) => {

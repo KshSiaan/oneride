@@ -16,6 +16,7 @@ import { getCategoriesApi, getEventsApi } from "@/lib/api/core";
 import { useCookies } from "react-cookie";
 import { idk } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
+import Link from "next/link";
 
 export default function Page() {
   const [cookies] = useCookies(["token"]);
@@ -49,9 +50,11 @@ export default function Page() {
           <h1 className="text-2xl">Event Management</h1>
           <p>Manage all upcoming and past events from one place</p>
         </div>
-        <Button className="rounded text-foreground" size="lg">
-          <PlusIcon />
-          Create New Event
+        <Button className="rounded text-foreground" size="lg" asChild>
+          <Link href={"/admin/create-event"}>
+            <PlusIcon />
+            Create New Event
+          </Link>
         </Button>
       </div>
 

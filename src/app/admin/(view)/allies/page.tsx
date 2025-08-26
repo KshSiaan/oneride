@@ -1,29 +1,35 @@
+"use client";
 import { Button } from "@/components/ui/button";
-import { PlusIcon } from "lucide-react";
-import React from "react";
+import { FileDownIcon, Loader2Icon } from "lucide-react";
+import React, { useState } from "react";
 
 import EventTable from "./event-table";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import { idk } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import { getAlliesApi } from "@/lib/api/core";
+import AddAlly from "./add-ally";
 export default function Page() {
+  const [page, setPage] = useState(1);
+  const { data, isPending } = useQuery({
+    queryKey: ["allies"],
+    queryFn: (): idk => {
+      return getAlliesApi({ page });
+    },
+  });
+
+  const pages = Array.from({ length: data?.data?.totalPages }, (_, i) => i + 1);
+  if (!isPending) {
+    console.log(data);
+  }
   return (
     <section className="p-4!">
       <div className="flex justify-between items-center w-full">
@@ -34,49 +40,73 @@ export default function Page() {
             website.
           </p>
         </div>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button className="rounded text-foreground" size="lg">
-              <PlusIcon />
-              Add new ally
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle className="text-center">Add new Ally</DialogTitle>
-            </DialogHeader>
-            <div className="py-12! space-y-4!">
-              <Label>Ally Name </Label>
-              <Input placeholder="Aa" />
-              <Label>Location </Label>
-              <Input placeholder="New york" />
-              <Label>Website URL </Label>
-              <Input placeholder="www.example.com" />
-              <Label>Type</Label>
-              <Select>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="light">Light</SelectItem>
-                  <SelectItem value="dark">Dark</SelectItem>
-                  <SelectItem value="system">System</SelectItem>
-                </SelectContent>
-              </Select>
-              <Label>Marketing Blurb</Label>
-              <Textarea placeholder="Aa" />
-              <div className="flex gap-2 items-center">
-                <Label>Status </Label> <Switch />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline">Cancel</Button>
-              <Button className="text-foreground">Save Ally</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <AddAlly />
       </div>
-      <EventTable />
+      {isPending ? (
+        <div className={`flex justify-center items-center h-24 mx-auto`}>
+          <Loader2Icon className={`animate-spin`} />
+        </div>
+      ) : (
+        <>
+          <EventTable data={data} />
+          <div className="w-full flex flex-row justify-between items-center mt-12!">
+            <div className=""></div>
+            <Pagination className="mt-12">
+              <PaginationContent>
+                {/* Previous button */}
+                <PaginationItem>
+                  <PaginationPrevious
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (page > 1) setPage(page - 1);
+                    }}
+                    className={
+                      page === 1 ? "pointer-events-none opacity-50" : ""
+                    }
+                  />
+                </PaginationItem>
+
+                {/* Page numbers */}
+                {pages.map((p) => (
+                  <PaginationItem key={p}>
+                    <PaginationLink
+                      href="#"
+                      isActive={p === page}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setPage(p);
+                      }}
+                    >
+                      {p}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+
+                {/* Next button */}
+                <PaginationItem>
+                  <PaginationNext
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (page < data?.data?.totalPages) setPage(page + 1);
+                    }}
+                    className={
+                      page === data?.data?.totalPages
+                        ? "pointer-events-none opacity-50"
+                        : ""
+                    }
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+            <Button variant={"outline"} className="rounded">
+              <FileDownIcon />
+              Export PDF
+            </Button>
+          </div>
+        </>
+      )}
     </section>
   );
 }

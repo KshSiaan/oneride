@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import {
   Table,
@@ -25,61 +26,26 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import Image from "next/image";
 import { idk } from "@/lib/utils";
 import { dateExtractor } from "@/lib/func/functions";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { updateCharterStatusApi } from "@/lib/api/core";
+import { useCookies } from "react-cookie";
+import { toast } from "sonner";
 
 export default function EventTable({ data }: { data: idk }) {
+  const [cookies] = useCookies(["token"]);
+  const qClient = useQueryClient();
   const list = data.result;
-
-  const charterRequests = [
-    {
-      requestId: "CR-1001",
-      userName: "John Smith",
-      dateOfJourney: "Jun 15, 2025",
-      origin: "123 Main St",
-      destination: "Convention center",
-      passenger: 35,
-      status: "Pending",
-    },
-    {
-      requestId: "CR-1002",
-      userName: "John Smith",
-      dateOfJourney: "Jun 15, 2025",
-      origin: "123 Main St",
-      destination: "Convention center",
-      passenger: 35,
-      status: "Approved",
-    },
-    {
-      requestId: "CR-1003",
-      userName: "John Smith",
-      dateOfJourney: "Jun 15, 2025",
-      origin: "123 Main St",
-      destination: "Convention center",
-      passenger: 35,
-      status: "Rejected",
-    },
-    {
-      requestId: "CR-1004",
-      userName: "John Smith",
-      dateOfJourney: "Jun 15, 2025",
-      origin: "456 Oak Ave",
-      destination: "Airport Terminal",
-      passenger: 20,
-      status: "Pending",
-    },
-    {
-      requestId: "CR-1005",
-      userName: "Jane Doe",
-      dateOfJourney: "Jun 20, 2025",
-      origin: "789 Pine Ln",
-      destination: "Stadium",
-      passenger: 50,
-      status: "Approved",
-    },
-  ];
-
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
       case "pending":
@@ -90,7 +56,27 @@ export default function EventTable({ data }: { data: idk }) {
         return "bg-green-500";
     }
   };
-
+  const { mutate } = useMutation({
+    mutationKey: ["update_status"],
+    mutationFn: ({
+      id,
+      status,
+    }: {
+      id: string;
+      status: "pending" | "approved" | "rejected";
+    }) => {
+      return updateCharterStatusApi(id, status, cookies.token);
+    },
+    onError: (err) => {
+      toast.error(err.message ?? "Something went wrong", {
+        description: "Failed to Update the Status",
+      });
+    },
+    onSuccess: (data: idk) => {
+      toast.success(data.message ?? "Successfully Updated Request");
+      qClient.invalidateQueries({ queryKey: ["charter"] });
+    },
+  });
   return (
     <>
       <Table className="mt-12!">
@@ -138,58 +124,71 @@ export default function EventTable({ data }: { data: idk }) {
                     <div className="grid gap-4 py-4">
                       <div className="grid grid-cols-2 items-center gap-4">
                         <p className="text-gray-400">Request ID:</p>
-                        <p className="font-medium">CR-1001</p>
+                        <p className="font-medium">{x._id}</p>
                       </div>
                       <div className="grid grid-cols-2 items-center gap-4">
                         <p className="text-gray-400">User Name:</p>
-                        <p className="font-medium">John Smith</p>
+                        <p className="font-medium">{x.name}</p>
                       </div>
                       <div className="grid grid-cols-2 items-center gap-4">
                         <p className="text-gray-400">Email:</p>
-                        <p className="font-medium">John.smith@example.com</p>
+                        <p className="font-medium">{x.email}</p>
                       </div>
                       <div className="grid grid-cols-2 items-center gap-4">
                         <p className="text-gray-400">Phone:</p>
-                        <p className="font-medium">+15222222</p>
+                        <p className="font-medium">{x.phone}</p>
                       </div>
                       <div className="grid grid-cols-2 items-center gap-4">
                         <p className="text-gray-400">Date of journey:</p>
-                        <p className="font-medium">Jun 30, 2025</p>
+                        <p className="font-medium">
+                          {new Date(x.pickupDateAndTime).toLocaleDateString()}
+                        </p>
                       </div>
                       <div className="grid grid-cols-2 items-center gap-4">
                         <p className="text-gray-400">Pickup Time:</p>
-                        <p className="font-medium">09:00 AM</p>
+                        <p className="font-medium">
+                          {new Date(x.pickupDateAndTime).toLocaleTimeString(
+                            [],
+                            {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            }
+                          )}
+                        </p>
                       </div>
                       <div className="grid grid-cols-2 items-center gap-4">
                         <p className="text-gray-400">Origin:</p>
-                        <p className="font-medium">
-                          123 Main St, San Francisco
-                        </p>
+                        <p className="font-medium">{x.pickupLocation}</p>
                       </div>
                       <div className="grid grid-cols-2 items-center gap-4">
                         <p className="text-gray-400">Destination:</p>
-                        <p className="font-medium">
-                          Convention Center, 456Tech Build
-                        </p>
+                        <p className="font-medium">{x.dropoffLocation}</p>
                       </div>
                       <div className="grid grid-cols-2 items-center gap-4">
                         <p className="text-gray-400">Passengers:</p>
-                        <p className="font-medium">45</p>
+                        <p className="font-medium">{x.passengerCount}</p>
                       </div>
-                      <div className="grid grid-cols-2 items-center gap-4">
-                        <p className="text-gray-400">Bus Type:</p>
-                        <p className="font-medium">Luxury Coach</p>
+                      {/* Not in API response */}
+                      {/* <div className="grid grid-cols-2 items-center gap-4">
+      <p className="text-gray-400">Bus Type:</p>
+      <p className="font-medium">{x.busType}</p>
+    </div> */}
+                      <div className="grid grid-cols-2 items-start gap-4">
+                        <p className="text-gray-400">Purpose:</p>
+                        <p className="font-medium">{x.purpose}</p>
                       </div>
                       <div className="grid grid-cols-2 items-start gap-4">
                         <p className="text-gray-400">Special Requests:</p>
-                        <p className="font-medium">
-                          Need wheelchair accessibility and onboard restroom
-                        </p>
+                        <p className="font-medium">{x.specialInstructions}</p>
                       </div>
                       <div className="grid grid-cols-2 items-center gap-4">
                         <p className="text-gray-400">Status:</p>
-                        <span className="inline-flex items-center !px-3 !py-1 rounded-full text-xs font-medium bg-red-800 text-white">
-                          Rejected
+                        <span
+                          className={`inline-flex items-center !px-3 !py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(
+                            x.status
+                          )} text-white`}
+                        >
+                          {x.status}
                         </span>
                       </div>
                     </div>
@@ -218,42 +217,46 @@ export default function EventTable({ data }: { data: idk }) {
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
-                {x.status === "pending" && (
+                {["pending"].includes(x.status) && (
                   <>
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-green-600"
-                        >
-                          <CheckIcon /> {/* Approve Icon */}
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle></DialogTitle>
-                        </DialogHeader>
-                        <div className="flex flex-col justify-center items-center gap-4">
-                          <Image
-                            src="/icon/thanks.gif"
-                            height={100}
-                            width={100}
-                            alt="approved"
-                            className="size-24"
-                          />
-                          <h3 className="text-2xl">Approved</h3>
-                          <p>You successfully approved</p>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="text-red-600"
+                      className="text-green-600"
+                      onClick={() => {
+                        mutate({ id: x._id, status: "approved" });
+                      }}
                     >
-                      <XIcon /> {/* Reject Icon */}
+                      <CheckIcon />
                     </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="text-red-600"
+                        >
+                          <XIcon />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          You are going to reject this charter request.
+                        </AlertDialogDescription>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <Button
+                            variant={"destructive"}
+                            onClick={() => {
+                              mutate({ id: x._id, status: "rejected" });
+                            }}
+                          >
+                            Reject
+                          </Button>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </>
                 )}
               </TableCell>
