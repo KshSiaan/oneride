@@ -1,4 +1,6 @@
+import { Suspense } from "react";
 import CharterForm from "./charter-form";
+import { Loader2Icon } from "lucide-react";
 
 export default function Page() {
   return (
@@ -13,7 +15,15 @@ export default function Page() {
         </div>
       </div>
       <div className="bg-secondary w-1/2 mx-auto! rounded-md mt-6!">
-        <CharterForm />
+        <Suspense
+          fallback={
+            <div className={`flex justify-center items-center h-24 mx-auto`}>
+              <Loader2Icon className={`animate-spin`} />
+            </div>
+          }
+        >
+          <CharterForm />
+        </Suspense>
       </div>
     </section>
   );

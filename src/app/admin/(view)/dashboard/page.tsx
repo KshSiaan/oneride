@@ -1,7 +1,7 @@
 "use client";
 import {
   BusFrontIcon,
-  CalendarCheck,
+  CalendarCheckIcon,
   CalendarOff,
   CalendarPlus2,
   MailIcon,
@@ -15,52 +15,119 @@ import React from "react";
 import { ChartPart } from "./chart-part";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
+import { useCookies } from "react-cookie";
+import { useQuery } from "@tanstack/react-query";
+import { getDashboardApi } from "@/lib/api/core";
+import { Skeleton } from "@/components/ui/skeleton";
+import { idk } from "@/lib/utils";
+
 export default function Page() {
+  const [cookies] = useCookies(["token"]);
+  const { data, isPending } = useQuery({
+    queryKey: ["dashboard"],
+    queryFn: (): idk => getDashboardApi(cookies.token),
+  });
+
+  const dashboardCards = [
+    {
+      title: "Total Events",
+      value: data?.data?.totalEvents,
+      icon: CalendarCheckIcon,
+      change: data?.data?.eventsChange?.change,
+      period: data?.data?.eventsChange?.period,
+      trend: data?.data?.eventsChange?.trend,
+    },
+    {
+      title: "Bookings Today",
+      value: data?.data?.bookingsToday,
+      icon: Menu,
+      change: data?.data?.bookingsChange?.change,
+      period: data?.data?.bookingsChange?.period,
+      trend: data?.data?.bookingsChange?.trend,
+    },
+    {
+      title: "Active Users",
+      value: data?.data?.activeUsers,
+      icon: UserIcon,
+      change: data?.data?.usersChange?.change,
+      period: data?.data?.usersChange?.period,
+      trend: data?.data?.usersChange?.trend,
+    },
+    {
+      title: "Pending Charter Requests",
+      value: data?.data?.pendingCharters,
+      icon: CalendarOff,
+      change: data?.data?.chartersChange?.change,
+      period: data?.data?.chartersChange?.period,
+      trend: data?.data?.chartersChange?.trend,
+    },
+  ];
+
   return (
     <>
       <div className="!pb-6 ">
         <h3 className="text-lg font-semibold">Overview</h3>
         <p className="text-sm text-muted-foreground font-medium">
-          Activities summary at a glance{" "}
+          Activities summary at a glance
         </p>
       </div>
-      <div className="grid grid-cols-4 gap-6 !pr-6">
-        {dbData.map((x, i) => (
-          <div
-            className="aspect-video border rounded-lg flex flex-col justify-around items-start !p-6 bg-secondary"
-            key={i}
-          >
-            <div className="bg-secondary !p-2 rounded-xl flex text-lg gap-2">
-              <div className="size-8 flex justify-center items-center rounded-full bg-primary">
-                <x.icon className="size-5" />
+
+      {isPending ? (
+        <div className={`grid grid-cols-4 gap-6 !pr-6`}>
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="w-full aspect-video" />
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-4 gap-6 !pr-6">
+          {dashboardCards.map((card, idx) => (
+            <div
+              key={idx}
+              className="aspect-video border rounded-lg flex flex-col justify-around items-start !p-6 bg-secondary"
+            >
+              <div className="bg-secondary !p-2 rounded-xl flex text-lg gap-2 items-center">
+                <div className="size-8 flex justify-center items-center rounded-full bg-primary">
+                  <card.icon className="size-4 text-white" />
+                </div>
+                {card.title}
               </div>
-              {x.title}
+
+              <h4 className="text-3xl">{card.value}</h4>
+
+              {card.trend === "increase" ? (
+                <p className="font-medium text-green-500 flex items-center">
+                  <TrendingUp className="size-4 mr-2" /> {card.change}{" "}
+                  {card.period}
+                </p>
+              ) : card.trend === "decrease" ? (
+                <p className="font-medium text-red-500 flex items-center">
+                  <TrendingDown className="size-4 mr-2" /> {card.change}{" "}
+                  {card.period}
+                </p>
+              ) : (
+                <p className="font-medium text-gray-500 flex items-center">
+                  No Change
+                </p>
+              )}
             </div>
-            <h4 className="text-3xl">{x.value}</h4>
-            {x.direction === "up" ? (
-              <p className="font-medium text-green-500 flex items-center">
-                <TrendingUp className="size-4 mr-2" /> {x.change} {x.period}
-              </p>
-            ) : (
-              <p className="font-medium text-red-500 flex items-center">
-                <TrendingDown className="size-4 mr-2" /> {x.change} {x.period}
-              </p>
-            )}
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
+
       <div className="!mt-6 !pr-6">
         <ChartPart />
       </div>
+
+      {/* Quick Actions */}
       <Card className="mt-6!">
         <CardHeader>
           <CardTitle>Quick Actions</CardTitle>
         </CardHeader>
         <CardContent className="w-full grid grid-cols-4 gap-6">
           <Link href="create-event">
-            <Card className="hover:scale-105  transition-transform">
+            <Card className="hover:scale-105 transition-transform">
               <CardContent className="flex flex-col justify-center items-center gap-2">
-                <div className="size-12 rounded-full flex items-center justify-center bg-primary ">
+                <div className="size-12 rounded-full flex items-center justify-center bg-primary">
                   <CalendarPlus2 className="size-6" />
                 </div>
                 <h3>Create new event</h3>
@@ -68,8 +135,9 @@ export default function Page() {
               </CardContent>
             </Card>
           </Link>
+
           <Link href="request-charter">
-            <Card>
+            <Card className="hover:scale-105 transition-transform">
               <CardContent className="flex flex-col justify-center items-center gap-2">
                 <div className="size-12 rounded-full flex items-center justify-center bg-primary ">
                   <BusFrontIcon className="size-6" />
@@ -81,7 +149,7 @@ export default function Page() {
           </Link>
 
           <Link href="invite-user">
-            <Card>
+            <Card className="hover:scale-105 transition-transform">
               <CardContent className="flex flex-col justify-center items-center gap-2">
                 <div className="size-12 rounded-full flex items-center justify-center bg-primary ">
                   <UserPlus2Icon className="size-6" />
@@ -91,8 +159,9 @@ export default function Page() {
               </CardContent>
             </Card>
           </Link>
+
           <Link href="send-email">
-            <Card>
+            <Card className="hover:scale-105 transition-transform">
               <CardContent className="flex flex-col justify-center items-center gap-2">
                 <div className="size-12 rounded-full flex items-center justify-center bg-primary ">
                   <MailIcon className="size-6" />
@@ -107,37 +176,3 @@ export default function Page() {
     </>
   );
 }
-const dbData = [
-  {
-    title: "Total Events",
-    value: "24",
-    icon: CalendarCheck,
-    change: "12%",
-    period: "from last month",
-    direction: "up",
-  },
-  {
-    title: "Bookings Today",
-    value: "156",
-    icon: Menu,
-    change: "8%",
-    period: "from yesterday",
-    direction: "up",
-  },
-  {
-    title: "Active Users",
-    value: "1,842",
-    icon: UserIcon,
-    change: "3.5%",
-    period: "from last week",
-    direction: "up",
-  },
-  {
-    title: "Pending Charter Requestes",
-    value: "7",
-    icon: CalendarOff,
-    change: "2%",
-    period: "from yesterday",
-    direction: "down",
-  },
-];

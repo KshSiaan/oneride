@@ -263,9 +263,37 @@ export const getPartnershipsApi = async (
 
 // >>>>>>>>>>> About Us <<<<<<<<<<<<<
 
-export const addAboutUsApi = async (body: FormData, token: string) => {
-    return howl("/about-us", { method: "POST", body, token })
-}
+export const addAboutUsApi = async (
+  body: {
+    headerText: string;
+    subText: string;
+    image?: File | null;
+  },
+  token: string
+) => {
+  const formData = new FormData();
+  formData.append("headerText", body.headerText);
+  formData.append("subText", body.subText);
+
+  if (body.image) {
+    formData.append("image", body.image);
+  }
+
+  const res = await fetch(`${base_api}/about-us`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`, // don't manually set Content-Type
+    },
+    body: formData,
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to add About Us: ${res.statusText}`);
+  }
+
+  return res.json();
+};
+
 
 export const getAboutUsApi = async (token: string) => {
     return howl("/about-us", { method: "GET", token })
@@ -273,13 +301,68 @@ export const getAboutUsApi = async (token: string) => {
 
 // >>>>>>>>>>> Team Member <<<<<<<<<<<<<
 
-export const addTeamMemberApi = async (body: FormData, token: string) => {
-    return howl("/team-members", { method: "POST", body, token })
-}
+export const addTeamMemberApi = async (
+  body: {
+    name: string;
+    role: string;
+    image?: File|null|undefined;
+  },
+  token: string
+) => {
+  const formData = new FormData();
+  formData.append("name", body.name);
+  formData.append("role", body.role);
+  if (body.image) {
+    formData.append("image", body.image);
+  }
 
-export const editTeamMemberApi = async (id: string, body: FormData, token: string) => {
-    return howl(`/team-members/${id}`, { method: "PUT", body, token })
-}
+  const res = await fetch(`${base_api}/team-members`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`, // don't set Content-Type manually
+    },
+    body: formData,
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to add team member: ${res.statusText}`);
+  }
+
+  return res.json();
+};
+
+export const editTeamMemberApi = async (
+  id: string,
+  body: {
+    name: string;
+    role: string;
+    image?: File | null; // optional in case they don’t change the image
+  },
+  token: string
+) => {
+  const formData = new FormData();
+  formData.append("name", body.name);
+  formData.append("role", body.role);
+
+  if (body.image) {
+    formData.append("image", body.image);
+  }
+
+  const res = await fetch(`${base_api}/team-members/${id}`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to edit team member: ${res.statusText}`);
+  }
+
+  return res.json();
+};
+
 
 export const deleteTeamMemberApi = async (id: string, token: string) => {
     return howl(`/team-members/${id}`, { method: "DELETE", token })
@@ -565,23 +648,33 @@ export const getAllMessagesApi = async (chatId: string, token: string) => {
 // >>>>>>>>>>> Terms & Service <<<<<<<<<<<<<
 
 export const getTermsOfServiceApi = async (token: string) => {
-    return howl("/terms-of-service/get-terms-of-service", { method: "GET", token })
+    return howl("/terms", { method: "GET", token })
 }
 
 export const addTermsOfServiceApi = async (body: { content: string }, token: string) => {
-    return howl("/terms-of-service/add-terms-of-service", { method: "POST", body, token })
+    return howl("/terms", { method: "POST", body, token })
 }
 
 // >>>>>>>>>>> FAQ <<<<<<<<<<<<<
 
 export const addFaqApi = async (body: { question: string; answer: string }, token: string) => {
-    return howl("/faq", { method: "POST", body, token })
+    return howl("/faqs", { method: "POST", body, token })
 }
 
 export const getFaqsApi = async (token: string) => {
-    return howl("/faq", { method: "GET", token })
+    return howl("/faqs", { method: "GET", token })
 }
 
 export const updateFaqApi = async (id: string, body: { question?: string; answer?: string }, token: string) => {
-    return howl(`/faq/${id}`, { method: "PATCH", body, token })
+    return howl(`/faqs/${id}`, { method: "PATCH", body, token })
+}
+
+export const deleteFaqApi = async (id: string, token: string) => {
+    return howl(`/faqs/${id}`, { method: "DELETE",token })
+}
+
+// >>>>>>>>>>> DASHBOARD <<<<<<<<<<<<<
+
+export const getDashboardApi = async (token: string) => {
+    return howl("/dashboard/overview", { method: "GET", token });
 }

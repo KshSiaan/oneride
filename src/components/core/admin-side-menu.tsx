@@ -83,11 +83,6 @@ export default function AdminSideMenu() {
       key: "events",
       icon: <CalendarCheckIcon className="size-6" />,
     },
-    // {
-    //   label: "Ticketing",
-    //   key: "ticketing",
-    //   icon: <TicketIcon className="size-6" />,
-    // },
     {
       label: "Categories",
       key: "categories",
@@ -141,6 +136,11 @@ export default function AdminSideMenu() {
         {
           label: "Terms & conditions",
           key: "tnc",
+          icon: <ChevronRight className="size-6" />,
+        },
+        {
+          label: "FAQ",
+          key: "faq",
           icon: <ChevronRight className="size-6" />,
         },
       ],

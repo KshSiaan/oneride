@@ -1,5 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import Directory from "./user-directory";
+import { Suspense } from "react";
+import { Loader2Icon } from "lucide-react";
 
 export default function Page() {
   return (
@@ -12,7 +14,15 @@ export default function Page() {
       </div>
       <Card className=" rounded-md mt-6!">
         <CardContent>
-          <Directory />
+          <Suspense
+            fallback={
+              <div className={`flex justify-center items-center h-24 mx-auto`}>
+                <Loader2Icon className={`animate-spin`} />
+              </div>
+            }
+          >
+            <Directory />
+          </Suspense>
         </CardContent>
       </Card>
     </section>

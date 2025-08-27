@@ -1,11 +1,17 @@
 "use client";
 
-import type React from "react";
-
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -14,224 +20,273 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createCharterApi } from "@/lib/api/core";
+import { toast } from "sonner";
+import { idk } from "@/lib/utils";
+
+const formSchema = z.object({
+  name: z.string().min(2, "Name is required"),
+  email: z.string().email("Invalid email"),
+  phone: z.string().min(7, "Phone is required"),
+  passengerCount: z
+    .string()
+    .refine((val) => !isNaN(Number(val)), "Must be a number"),
+  pickupLocation: z.string().min(1, "Pickup location required"),
+  dropoffLocation: z.string().min(1, "Drop-off location required"),
+  pickupDate: z.string().min(1, "Date required"),
+  pickupTime: z.string().min(1, "Time required"),
+  purpose: z.string().min(1, "Purpose required"),
+  specialInstructions: z.string().optional(),
+});
 
 export default function CharterForm() {
-  const [formData, setFormData] = useState({
-    clientName: "",
-    email: "",
-    phone: "",
-    passengers: "",
-    pickupLocation: "",
-    dropoffLocation: "",
-    pickupDate: "",
-    pickupTime: "",
-    purpose: "",
-    instructions: "",
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      passengerCount: "",
+      pickupLocation: "",
+      dropoffLocation: "",
+      pickupDate: "",
+      pickupTime: "",
+      purpose: "",
+      specialInstructions: "",
+    },
+  });
+  const qCl = useQueryClient();
+  const { mutate } = useMutation({
+    mutationKey: ["charter_add"],
+    mutationFn: (data: {
+      name: string;
+      email: string;
+      phone: string;
+      passengerCount: number;
+      pickupLocation: string;
+      dropoffLocation: string;
+      pickupDateAndTime: string;
+      purpose: string;
+      specialInstructions: string;
+    }): idk => {
+      return createCharterApi(data);
+    },
+    onError: (err) => {
+      toast.error(err.message ?? "Failed to complete this request");
+    },
+    onSuccess: (data: idk) => {
+      toast.success(
+        data.message ?? "Successfully Created a new Charter request"
+      );
+      qCl.invalidateQueries({ queryKey: ["charter"] });
+    },
   });
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    // merge date + time → ISO
+    const pickupDateAndTime = new Date(
+      `${values.pickupDate}T${values.pickupTime}`
+    ).toISOString();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Form submitted:", formData);
-  };
+    const payload = {
+      name: values.name,
+      email: values.email,
+      phone: values.phone,
+      passengerCount: Number(values.passengerCount),
+      pickupLocation: values.pickupLocation,
+      dropoffLocation: values.dropoffLocation,
+      pickupDateAndTime,
+      purpose: values.purpose,
+      specialInstructions: values.specialInstructions || "",
+    };
+
+    mutate(payload); // ✅ send the correct object
+    console.log("Form submitted:", payload);
+  }
 
   return (
-    <div className="w-full mx-auto! text-foreground p-6! rounded-lg">
-      <form onSubmit={handleSubmit} className="space-y-6!">
-        <div className="space-y-2!">
-          <Label htmlFor="clientName" className="text-foreground">
-            Client Name *
-          </Label>
-          <Input
-            id="clientName"
-            type="text"
-            placeholder="John"
-            value={formData.clientName}
-            onChange={(e) => handleInputChange("clientName", e.target.value)}
-            className="bg-background border-foreground/20 text-foreground placeholder:text-foreground/50"
-            required
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-6 w-full max-w-2xl mx-auto p-6"
+      >
+        {/* Name */}
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Client Name *</FormLabel>
+              <FormControl>
+                <Input placeholder="John" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Email */}
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email Address *</FormLabel>
+              <FormControl>
+                <Input placeholder="john@gmail.com" type="email" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Phone */}
+        <FormField
+          control={form.control}
+          name="phone"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Phone Number *</FormLabel>
+              <FormControl>
+                <Input placeholder="01999999999" type="tel" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Passengers */}
+        <FormField
+          control={form.control}
+          name="passengerCount"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Number of Passengers *</FormLabel>
+              <FormControl>
+                <Input placeholder="e.g. 25" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Pickup Location */}
+        <FormField
+          control={form.control}
+          name="pickupLocation"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Pickup Location *</FormLabel>
+              <FormControl>
+                <Input placeholder="Address" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Drop-off Location */}
+        <FormField
+          control={form.control}
+          name="dropoffLocation"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Drop-off Location *</FormLabel>
+              <FormControl>
+                <Input placeholder="Address" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Pickup Date + Time */}
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="pickupDate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Pickup Date *</FormLabel>
+                <FormControl>
+                  <Input type="date" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="pickupTime"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Pickup Time *</FormLabel>
+                <FormControl>
+                  <Input type="time" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
         </div>
 
-        <div className="space-y-2!">
-          <Label htmlFor="email" className="text-foreground">
-            Email Address *
-          </Label>
-          <Input
-            id="email"
-            type="email"
-            placeholder="John@gmail.com"
-            value={formData.email}
-            onChange={(e) => handleInputChange("email", e.target.value)}
-            className="bg-background border-foreground/20 text-foreground placeholder:text-foreground/50"
-            required
-          />
-        </div>
+        {/* Purpose */}
+        <FormField
+          control={form.control}
+          name="purpose"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Purpose of Charter *</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select purpose" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="business">Business Trip</SelectItem>
+                  <SelectItem value="wedding">Wedding</SelectItem>
+                  <SelectItem value="airport">Airport Transfer</SelectItem>
+                  <SelectItem value="event">Special Event</SelectItem>
+                  <SelectItem value="tour">City Tour</SelectItem>
+                  <SelectItem value="birthday party">Birthday Party</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-        <div className="space-y-2!">
-          <Label htmlFor="phone" className="text-foreground">
-            Phone Number *
-          </Label>
-          <Input
-            id="phone"
-            type="tel"
-            placeholder="01222222222"
-            value={formData.phone}
-            onChange={(e) => handleInputChange("phone", e.target.value)}
-            className="bg-background border-foreground/20 text-foreground placeholder:text-foreground/50"
-            required
-          />
-        </div>
+        {/* Special Instructions */}
+        <FormField
+          control={form.control}
+          name="specialInstructions"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Special Instructions</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Give any instruction"
+                  className="min-h-[100px]"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-        <div className="space-y-2!">
-          <Label htmlFor="passengers" className="text-foreground">
-            Number of Passengers *
-          </Label>
-          <Input
-            id="passengers"
-            type="text"
-            placeholder="eg:25"
-            value={formData.passengers}
-            onChange={(e) => handleInputChange("passengers", e.target.value)}
-            className="bg-background border-foreground/20 text-foreground placeholder:text-foreground/50"
-            required
-          />
-        </div>
-
-        <div className="space-y-2!">
-          <Label htmlFor="pickupLocation" className="text-foreground">
-            Pickup Location *
-          </Label>
-          <Input
-            id="pickupLocation"
-            type="text"
-            placeholder="Address"
-            value={formData.pickupLocation}
-            onChange={(e) =>
-              handleInputChange("pickupLocation", e.target.value)
-            }
-            className="bg-background border-foreground/20 text-foreground placeholder:text-foreground/50"
-            required
-          />
-        </div>
-
-        <div className="space-y-2!">
-          <Label htmlFor="dropoffLocation" className="text-foreground">
-            Drop-off Location *
-          </Label>
-          <Input
-            id="dropoffLocation"
-            type="text"
-            placeholder="Address"
-            value={formData.dropoffLocation}
-            onChange={(e) =>
-              handleInputChange("dropoffLocation", e.target.value)
-            }
-            className="bg-background border-foreground/20 text-foreground placeholder:text-foreground/50"
-            required
-          />
-        </div>
-
-        <div className="space-y-2!">
-          <Label className="text-foreground">Pickup Date & Time *</Label>
-          <div className="grid grid-cols-2 gap-4">
-            <Input
-              type="text"
-              placeholder="dd/mm/yyyy"
-              value={formData.pickupDate}
-              onChange={(e) => handleInputChange("pickupDate", e.target.value)}
-              className="bg-background border-foreground/20 text-foreground placeholder:text-foreground/50"
-              required
-            />
-            <Input
-              type="text"
-              placeholder="9:50AM"
-              value={formData.pickupTime}
-              onChange={(e) => handleInputChange("pickupTime", e.target.value)}
-              className="bg-background border-foreground/20 text-foreground placeholder:text-foreground/50"
-              required
-            />
-          </div>
-        </div>
-
-        <div className="space-y-2!">
-          <Label htmlFor="purpose" className="text-foreground">
-            Purpose of Charter *
-          </Label>
-          <Select
-            onValueChange={(value) => handleInputChange("purpose", value)}
-            required
-          >
-            <SelectTrigger className="bg-background border-foreground/20 text-foreground w-full">
-              <SelectValue placeholder="Select purpose" />
-            </SelectTrigger>
-            <SelectContent className="bg-background border-foreground/20">
-              <SelectItem
-                value="business"
-                className="text-foreground hover:bg-foreground/10"
-              >
-                Business Trip
-              </SelectItem>
-              <SelectItem
-                value="wedding"
-                className="text-foreground hover:bg-foreground/10"
-              >
-                Wedding
-              </SelectItem>
-              <SelectItem
-                value="airport"
-                className="text-foreground hover:bg-foreground/10"
-              >
-                Airport Transfer
-              </SelectItem>
-              <SelectItem
-                value="event"
-                className="text-foreground hover:bg-foreground/10"
-              >
-                Special Event
-              </SelectItem>
-              <SelectItem
-                value="tour"
-                className="text-foreground hover:bg-foreground/10"
-              >
-                City Tour
-              </SelectItem>
-              <SelectItem
-                value="other"
-                className="text-foreground hover:bg-foreground/10"
-              >
-                Other
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2!">
-          <Label htmlFor="instructions" className="text-foreground">
-            Special Instructions
-          </Label>
-          <Textarea
-            id="instructions"
-            placeholder="Give any instruction"
-            value={formData.instructions}
-            onChange={(e) => handleInputChange("instructions", e.target.value)}
-            className="bg-background border-foreground/20 text-foreground placeholder:text-foreground/50 min-h-[100px]"
-            rows={4}
-          />
-        </div>
-
-        <div className="w-full flex justify-end items-center gap-6">
+        {/* Actions */}
+        <div className="flex justify-end gap-4">
           <Button type="reset" variant="outline">
             Cancel
           </Button>
-          <Button type="submit" className=" text-foreground">
-            Submit Charter Request
-          </Button>
+          <Button type="submit">Submit Charter Request</Button>
         </div>
       </form>
-    </div>
+    </Form>
   );
 }
