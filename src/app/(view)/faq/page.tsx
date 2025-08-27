@@ -1,14 +1,12 @@
-import React, { Suspense } from "react";
-import Tnc from "./tnc";
 import { Loader2Icon } from "lucide-react";
+import React, { Suspense } from "react";
+import FAQ from "./faq";
 
 export default function Page() {
   return (
-    <div className="lg:w-4/5 mx-auto! !py-12 px-4! lg;px-[7%]! text-sm md:text-base">
-      <h1 className="text-3xl lg:text-6xl text-center font-bold text-white mb-4! !mt-4">
-        Terms & Conditions
-      </h1>
-      <div className="">
+    <main className="pb-12">
+      <h1 className="text-6xl text-center py-12">FAQ</h1>
+      <div className="w-4/5 mx-auto">
         <Suspense
           fallback={
             <div className={`flex justify-center items-center h-24 mx-auto`}>
@@ -16,9 +14,9 @@ export default function Page() {
             </div>
           }
         >
-          <Tnc />
+          <FAQ />
         </Suspense>
       </div>
-    </div>
+    </main>
   );
 }

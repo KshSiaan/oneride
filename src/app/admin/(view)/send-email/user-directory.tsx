@@ -3,18 +3,23 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Mail, Search, Users } from "lucide-react";
+import { getInvitationsApi } from "@/lib/api/core";
+import { idk } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import { Loader2Icon, Mail, Search, Users } from "lucide-react";
+import { useCookies } from "react-cookie";
 
 export default function Directory() {
-  // Sample user data
-  const users = Array.from({ length: 10 }, (_, i) => ({
-    id: i + 1,
-    name: `User ${i + 1}`,
-    email: `user${i + 1}@example.com`,
-    avatar: `/placeholder.svg?height=40&width=40`,
-    initials: `U${i + 1}`,
-  }));
+  const [cookies] = useCookies(["token"]);
+  const { data, isPending } = useQuery({
+    queryKey: ["invites"],
+    queryFn: (): idk => {
+      return getInvitationsApi({}, cookies.token);
+    },
+  });
 
+  
+  
   return (
     <div className="min-h-screen p-4!">
       <div className="mx-auto!">
@@ -35,39 +40,47 @@ export default function Directory() {
           </CardHeader>
           <CardContent className="">
             <div className="divide-y divide">
-              {users.map((user) => (
+              {isPending ? (
                 <div
-                  key={user.id}
-                  className="flex items-center justify-between p-4! hover:bg-secondary transition-colors"
+                  className={`flex justify-center items-center h-24 mx-auto`}
                 >
-                  <div className="flex items-center gap-4">
-                    <Avatar className="h-12 w-12 border-2 ">
-                      <AvatarImage
-                        src={user.avatar || "/placeholder.svg"}
-                        alt={user.name}
-                        className="object-cover"
-                      />
-                      <AvatarFallback className="font-medium">
-                        {user.initials}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                      <span className="font-medium">{user.name}</span>
-                      <span className="text-sm text-muted-foreground">
-                        {user.email}
-                      </span>
-                    </div>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className=" transition-colors bg-transparent"
-                  >
-                    <Mail className="h-4 w-4 mr-2" />
-                    Send Email
-                  </Button>
+                  <Loader2Icon className={`animate-spin`} />
                 </div>
-              ))}
+              ) : (
+                data.data.map((user: idk) => (
+                  <div
+                    key={user.id}
+                    className="flex items-center justify-between p-4! hover:bg-secondary transition-colors"
+                  >
+                    <div className="flex items-center gap-4">
+                      <Avatar className="h-12 w-12 border-2 ">
+                        <AvatarImage
+                          src={user.avatar || "/placeholder.svg"}
+                          alt={user.fullName}
+                          className="object-cover"
+                        />
+                        <AvatarFallback className="font-medium uppercase">
+                          {user.fullName.slice(0, 2)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col">
+                        <span className="font-medium">{user.fullName}</span>
+                        <span className="text-sm text-muted-foreground">
+                          {user.email}
+                        </span>
+                      </div>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className=" transition-colors bg-transparent"
+                    >
+                      <Mail className="h-4 w-4 mr-2" />
+                      Send Email
+                    </Button>
+                  </div>
+                ))
+              )}
             </div>
           </CardContent>
         </Card>
