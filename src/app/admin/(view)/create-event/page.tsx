@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import {
   Calendar,
-  MapPin,
   DollarSign,
   ImageIcon,
   Settings,
@@ -30,14 +29,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import LocationPicker from "@/components/core/location-picker";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import Image from "next/image";
+import Link from "next/link";
 
 const formSchema = z.object({
   title: z.string().min(1, "Event title is required"),
@@ -48,21 +41,7 @@ const formSchema = z.object({
   startTime: z.string().min(1, "Start time is required"),
   endTime: z.string().min(1, "End time is required"),
 
-  pickup: z.object({
-    address: z.string().min(1, "Pickup required"),
-    lat: z.string().optional(),
-    lng: z.string().optional(),
-  }),
-  park: z.object({
-    address: z.string().min(1, "Park required"),
-    lat: z.string().optional(),
-    lng: z.string().optional(),
-  }),
-  venue: z.object({
-    address: z.string().min(1, "Venue required"),
-    lat: z.string().optional(),
-    lng: z.string().optional(),
-  }),
+  transportation: z.string().min(1),
 
   image: z.any().optional(),
 
@@ -88,21 +67,7 @@ export default function CreateEventPage() {
       endDate: "",
       startTime: "",
       endTime: "",
-      pickup: {
-        address: "",
-        lat: "",
-        lng: "",
-      },
-      park: {
-        address: "",
-        lat: "",
-        lng: "",
-      },
-      venue: {
-        address: "",
-        lat: "",
-        lng: "",
-      },
+      transportation: "",
       totalSeats: "",
       ticketPrice: "",
       eventStatus: "",
@@ -129,7 +94,11 @@ export default function CreateEventPage() {
           <h1 className="text-3xl font-bold mb-2!">Create New Event</h1>
           <p>Fill out the form below to create a new transportation event</p>
         </div>
-
+        <div className="flex justify-end items-center">
+          <Button asChild>
+            <Link href={"/admin/create-event/pickups"}>Manage Pickups</Link>
+          </Button>
+        </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6!">
             {/* Event Information Section */}
@@ -277,144 +246,21 @@ export default function CreateEventPage() {
               </div>
             </div>
 
-            {/* Location Details Section */}
             <div className="rounded-lg p-6!">
-              <div className="flex items-center gap-2 mb-6!">
-                <MapPin className="w-4 h-4 text-primary" />
-                <h2 className="text-lg font-semibold text-primary">
-                  Location Details
-                </h2>
-              </div>
-
-              {/* Pickup */}
-              <div className="mb-4">
-                <h3 className="mb-4!">Select Pickup Point</h3>
-                <div className="grid grid-cols-6 gap-6">
-                  <div className="col-span-5">
-                    <FormField
-                      control={form.control}
-                      name="pickup.address"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <LocationPicker
-                              onLocationSelect={(locationData) => {
-                                if (locationData) {
-                                  field.onChange(locationData.address || "");
-                                  form.setValue(
-                                    "pickup.lat",
-                                    String(locationData.lat)
-                                  );
-                                  form.setValue(
-                                    "pickup.lng",
-                                    String(locationData.lng)
-                                  );
-                                }
-                              }}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  {/* Keep dropdown untouched */}
-                  <div>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          className="w-full h-full flex justify-center items-center"
-                          variant={"default"}
-                          type="button"
-                        >
-                          Select from saved
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent
-                        className="w-[30dvw] bg-background"
-                        side="bottom"
-                        align="end"
-                      >
-                        <DropdownMenuItem className="w-full flex-col">
-                          <p className="w-full text-lg">
-                            43 Mohakhali C/A, Dhaka 1212, Bangladesh
-                          </p>
-                          <div className="w-full grid grid-cols-2 gap-2 text-muted-foreground">
-                            <p>Lat:12.870798</p>
-                            <p>Long:-45.987234</p>
-                          </div>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="w-full flex-col">
-                          <p className="w-full text-lg">
-                            Banasree C Block Avenue Road, Dhaka Ave 3, Dhaka,
-                            Bangladesh
-                          </p>
-                          <div className="w-full grid grid-cols-2 gap-2 text-muted-foreground">
-                            <p>Lat:23.758739</p>
-                            <p>Long:90.428947</p>
-                          </div>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </div>
-              </div>
-
-              {/* Park */}
-              <div className="mb-4">
-                <h3 className="mb-4!">Select Park & Ride Point</h3>
-                <FormField
-                  control={form.control}
-                  name="park.address"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <LocationPicker
-                          onLocationSelect={(locationData) => {
-                            if (locationData) {
-                              field.onChange(locationData.address || "");
-                              form.setValue(
-                                "park.lat",
-                                String(locationData.lat)
-                              );
-                              form.setValue(
-                                "park.lng",
-                                String(locationData.lng)
-                              );
-                            }
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
               {/* Venue */}
               <div className="mb-4">
-                <h3 className="mb-4!">Select Venue</h3>
+                <h3 className="mb-4!">Select Route</h3>
                 <FormField
                   control={form.control}
-                  name="venue.address"
+                  name="transportation"
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <LocationPicker
-                          onLocationSelect={(locationData) => {
-                            if (locationData) {
-                              field.onChange(locationData.address || "");
-                              form.setValue(
-                                "venue.lat",
-                                String(locationData.lat)
-                              );
-                              form.setValue(
-                                "venue.lng",
-                                String(locationData.lng)
-                              );
-                            }
-                          }}
-                        />
+                        <Select {...field}>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select Route" />
+                          </SelectTrigger>
+                        </Select>
                       </FormControl>
                       <FormMessage />
                     </FormItem>

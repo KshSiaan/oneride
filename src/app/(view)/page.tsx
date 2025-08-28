@@ -8,8 +8,7 @@ import {
 } from "@/components/ui/select";
 import GettingThere from "./_home/getting-there";
 import Questions from "./_home/questions";
-import { Marquee } from "@/components/magicui/marquee";
-import EventCard from "@/components/core/event-card";
+import EventMaquee from "./_home/event-marquee";
 
 export default function Home() {
   const slideResouce = [
@@ -93,13 +92,7 @@ export default function Home() {
           <h3 className="text-sm lg:text-2xl text-center">
             Find your ride to the next big thing
           </h3>
-          <Marquee pauseOnHover className="[--duration:20s]">
-            <div className="grid grid-cols-3 gap-6 px-6!">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <EventCard key={i} />
-              ))}
-            </div>
-          </Marquee>
+          <EventMaquee />
           <GettingThere />
           <Questions />
         </div>

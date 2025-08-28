@@ -372,22 +372,22 @@ export const getTeamMembersApi = async ({ status, type }: { status?: string; typ
     return howl(`/team-members?status=${status ?? ""}&type=${type ?? ""}`, { method: "GET", token })
 }
 
-// >>>>>>>>>>> Transport <<<<<<<<<<<<<
+// // >>>>>>>>>>> Transport <<<<<<<<<<<<<
 
-export const createTransportApi = async (
-    body: { type: "busRoute" | "parkAndRide" | "pubPickup"; pickUpPoint: string; duration: number; departureTime: string },
-    token: string
-) => {
-    return howl("/transports", { method: "POST", body, token })
-}
+// export const createTransportApi = async (
+//     body: { type: "busRoute" | "parkAndRide" | "pubPickup"; pickUpPoint: string; duration: number; departureTime: string },
+//     token: string
+// ) => {
+//     return howl("/transports", { method: "POST", body, token })
+// }
 
-export const deleteTransportApi = async (id: string, token: string) => {
-    return howl(`/transports/${id}`, { method: "DELETE", token })
-}
+// export const deleteTransportApi = async (id: string, token: string) => {
+//     return howl(`/transports/${id}`, { method: "DELETE", token })
+// }
 
-export const getTransportsApi = async (token: string) => {
-    return howl("/transports", { method: "GET", token })
-}
+// export const getTransportsApi = async (token: string) => {
+//     return howl("/transports", { method: "GET", token })
+// }
 
 // >>>>>>>>>>> Event <<<<<<<<<<<<<
 
@@ -678,3 +678,29 @@ export const deleteFaqApi = async (id: string, token: string) => {
 export const getDashboardApi = async (token: string) => {
     return howl("/dashboard/overview", { method: "GET", token });
 }
+
+// >>>>>>>>>>> TRANSPORTATION <<<<<<<<<<<<<
+
+export const getPickupsApi = async (token: string,type?:string) => {
+    return howl(`/transports?type=${type}`, { method: "GET", token });
+}
+
+export const createPickupsApi = async (body:{
+  type:string,
+  pickUpPoint:{
+    name:string,
+    lat:string,
+    lng:string
+  },
+  dropOffPoint:{
+    name:string,
+    lat:string,
+    lng:string
+  },
+  duration:string,
+  departureTime:string
+
+},token: string,) => {
+    return howl(`/transports`, {body, method: "POST", token });
+}
+
