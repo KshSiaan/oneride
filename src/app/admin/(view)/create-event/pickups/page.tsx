@@ -20,11 +20,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { createPickupsApi } from "@/lib/api/core";
+import {
+  createPickupsApi,
+  deletePickupsApi,
+  getPickupsApi,
+} from "@/lib/api/core";
+import { dateExtractor, timeExtractor } from "@/lib/func/functions";
 
 import { idk } from "@/lib/utils";
-import { useMutation } from "@tanstack/react-query";
-import { ArrowLeftIcon, ArrowRight, Trash2Icon } from "lucide-react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  ArrowLeftIcon,
+  ArrowRight,
+  ClockIcon,
+  Loader2Icon,
+  MapPin,
+  RouteIcon,
+  Trash2Icon,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { useCookies } from "react-cookie";
@@ -38,9 +51,19 @@ export default function Page() {
   const [pickupType, setPickupType] = useState<
     "busRoute" | "parkAndRide" | "pubPickup" | ""
   >("");
+  const [selectedPickupType, setSelectedPickupType] = useState<
+    "busRoute" | "parkAndRide" | "pubPickup" | "all" | ""
+  >("");
   const [departureTime, setDepartureTime] = useState("");
   const [cookies] = useCookies(["token"]);
-
+  const { data, isPending, refetch } = useQuery({
+    queryKey: ["transport", selectedPickupType],
+    queryFn: (): idk => {
+      return getPickupsApi(
+        selectedPickupType === "all" ? "" : selectedPickupType
+      );
+    },
+  });
   const { mutate } = useMutation({
     mutationKey: ["add_transport"],
     mutationFn: (data: {
@@ -63,6 +86,19 @@ export default function Page() {
     },
     onSuccess: (data: idk) => {
       toast.success(data.message ?? "Route added successfully");
+      refetch();
+    },
+  });
+
+  const { mutate: deleteTransport } = useMutation({
+    mutationKey: ["add_transport"],
+    mutationFn: (id: string) => deletePickupsApi(id),
+    onError: (err) => {
+      toast.error(err.message ?? "Failed to complete this request");
+    },
+    onSuccess: (data: idk) => {
+      toast.success(data.message ?? "Route deleted successfully");
+      refetch();
     },
   });
 
@@ -190,35 +226,79 @@ export default function Page() {
         </form>
       </div>
       <Card className="mt-12">
-        <CardHeader>
+        <CardHeader className="flex justify-between items-center">
           <CardTitle>Available Pickups</CardTitle>
+          <Select onValueChange={(val) => setSelectedPickupType(val as any)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select Pickup type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="parkAndRide">Park & Ride</SelectItem>
+              <SelectItem value="pubPickup">Pub Pickup</SelectItem>
+              <SelectItem value="busRoute">Bus Route</SelectItem>
+            </SelectContent>
+          </Select>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <Card>
-            <CardContent className="flex items-center justify-between">
-              <div className="flex items-center gap-6">
-                LOL <ArrowRight className="size-4 text-muted-foreground" /> LOL
-              </div>
-              <div>
-                <Button variant={"ghost"} size={"icon"}>
-                  <Trash2Icon className="text-destructive" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+        <CardContent className="space-y-6 max-h-dvh overflow-auto">
+          {isPending ? (
+            <div className={`flex justify-center items-center h-24 mx-auto`}>
+              <Loader2Icon className={`animate-spin`} />
+            </div>
+          ) : (
+            data.data.map((trip: idk) => (
+              <Card
+                key={trip._id}
+                className="hover:shadow-md transition-shadow"
+              >
+                <CardContent className="p-6">
+                  {/* Route Section */}
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      <MapPin className="size-4 text-muted-foreground flex-shrink-0" />
+                      <span className="font-medium truncate">
+                        {trip?.pickUpPoint?.name ?? "N/A"}
+                      </span>
+                      <ArrowRight className="size-4 text-muted-foreground flex-shrink-0" />
+                      <span className="font-medium truncate">
+                        {trip?.dropOffPoint?.name ?? "N/A"}
+                      </span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => deleteTransport(trip._id)}
+                      className="text-muted-foreground hover:text-destructive flex-shrink-0"
+                    >
+                      <Trash2Icon className="size-4" />
+                    </Button>
+                  </div>
 
-          <Card>
-            <CardContent className="flex items-center justify-between">
-              <div className="flex items-center gap-6">
-                LOL <ArrowRight className="size-4 text-muted-foreground" /> LOL
-              </div>
-              <div>
-                <Button variant={"ghost"} size={"icon"}>
-                  <Trash2Icon className="text-destructive" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+                  {/* Trip Details */}
+                  <div className="flex flex-wrap gap-6 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2">
+                      <ClockIcon className="size-4" />
+                      <span>
+                        {timeExtractor(trip.departureTime)} •{" "}
+                        {dateExtractor(trip.departureTime)}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <RouteIcon className="size-4" />
+                      <span>{trip.type}</span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">
+                        {Number.parseInt(trip.duration)} min
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
         </CardContent>
       </Card>
     </main>

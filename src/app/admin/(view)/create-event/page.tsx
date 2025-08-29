@@ -9,6 +9,9 @@ import {
   ImageIcon,
   Settings,
   AlertCircleIcon,
+  Loader2Icon,
+  ArrowDown,
+  MapPin,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -31,6 +34,11 @@ import {
 } from "@/components/ui/select";
 import Image from "next/image";
 import Link from "next/link";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { createEventApi, getPickupsApi } from "@/lib/api/core";
+import type { idk } from "@/lib/utils";
+import { useCookies } from "react-cookie";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   title: z.string().min(1, "Event title is required"),
@@ -40,23 +48,78 @@ const formSchema = z.object({
   endDate: z.string().min(1, "End date is required"),
   startTime: z.string().min(1, "Start time is required"),
   endTime: z.string().min(1, "End time is required"),
-
-  transportation: z.string().min(1),
-
+  venueName: z.string().min(1, "Venue name is required"),
+  totalSeat: z.number().min(1, "Total seats is required"),
+  ticketPrice: z.number().min(1, "Ticket price is required"),
+  adminStatus: z.enum(["active", "draft", "ended"]),
+  websiteStatus: z.enum(["upcoming", "featured"]),
+  transports: z.array(z.string().min(1)),
   image: z.any().optional(),
-
-  totalSeats: z.string().min(1, "Total seats is required"),
-  ticketPrice: z.string().min(1, "Ticket price is required"),
-  eventStatus: z.string().min(1, "Event status is required"),
 });
 
-// interface LocationData {
-//   lat: number;
-//   lng: number;
-//   address?: string;
-// }
-
 export default function CreateEventPage() {
+  const [cookies] = useCookies(["token"]);
+  const { data, isPending } = useQuery({
+    queryKey: ["routes"],
+    queryFn: (): idk => {
+      return getPickupsApi();
+    },
+  });
+
+  const { mutate } = useMutation({
+    mutationKey: ["add_event"],
+    mutationFn: (data: {
+      title: string;
+      category: string;
+      description: string;
+      startDate: string;
+      endDate: string;
+      startTime: string;
+      endTime: string;
+      venueName: string;
+      transportation: string[];
+      totalSeats: string;
+      ticketPrice: string;
+      eventStatus: string;
+      adminStatus: string;
+      websiteStatus: string;
+      image?: File;
+    }) => {
+      console.log(data);
+
+      const formData = new FormData();
+
+      formData.append("title", data.title);
+      formData.append("category", data.category);
+      formData.append("description", data.description);
+      formData.append("startDate", data.startDate);
+      formData.append("endDate", data.endDate);
+      formData.append("startTime", data.startTime);
+      formData.append("endTime", data.endTime);
+      formData.append("venueName", data.venueName);
+      formData.append("totalSeats", data.totalSeats);
+      formData.append("ticketPrice", data.ticketPrice);
+      formData.append("eventStatus", data.eventStatus);
+      formData.append("adminStatus", data.adminStatus);
+      formData.append("websiteStatus", data.websiteStatus);
+
+      // Transportation array -> convert to JSON string
+      formData.append("transportation", JSON.stringify(data.transportation));
+
+      // Image if exists
+      if (data.image) formData.append("image", data.image);
+
+      return createEventApi(formData, cookies.token);
+    },
+    onError: (err) => {
+      toast.error(err.message ?? "Failed to complete this request");
+      console.log(err);
+    },
+    onSuccess: (data: idk) => {
+      toast.success(data.message ?? "Event Created Successfully");
+    },
+  });
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -67,23 +130,51 @@ export default function CreateEventPage() {
       endDate: "",
       startTime: "",
       endTime: "",
-      transportation: "",
-      totalSeats: "",
-      ticketPrice: "",
-      eventStatus: "",
+      venueName: "",
+      transports: [],
+      totalSeat: 0,
+      ticketPrice: 0,
+      adminStatus: "draft",
+      websiteStatus: "upcoming",
+      image: undefined,
     },
   });
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
-    console.log("Submitted:", data);
+  const selectedRoutes = form.watch("transports");
+
+  // Add new empty select
+  function addRoute() {
+    form.setValue("transports", [...selectedRoutes, ""]);
+  }
+
+  // Remove a select if needed (optional)
+  function removeRoute(index: number) {
+    const updated = [...selectedRoutes];
+    updated.splice(index, 1);
+    form.setValue("transports", updated);
+  }
+
+  const onSubmit = (data: z.infer<typeof formSchema>, isDraft = false) => {
+    const submitData = {
+      ...data,
+      adminStatus: isDraft ? "draft" : "active",
+      totalSeats: data.totalSeat.toString(),
+      ticketPrice: data.ticketPrice.toString(),
+      transportation: data.transports,
+      eventStatus: data.websiteStatus,
+      websiteStatus: data.websiteStatus,
+    };
+    console.log("Submitted:", submitData);
+    mutate(submitData);
   };
 
   function onSaveDraft() {
-    console.log("Saving as draft...");
+    form.handleSubmit((data) => onSubmit(data, true))();
   }
 
   function onCancel() {
     console.log("Cancelling...");
+    form.reset();
   }
 
   return (
@@ -100,7 +191,10 @@ export default function CreateEventPage() {
           </Button>
         </div>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6!">
+          <form
+            onSubmit={form.handleSubmit((data) => onSubmit(data, false))}
+            className="space-y-6!"
+          >
             {/* Event Information Section */}
             <div className="rounded-lg p-6!">
               <div className="flex items-center gap-2 mb-6!">
@@ -247,26 +341,132 @@ export default function CreateEventPage() {
             </div>
 
             <div className="rounded-lg p-6!">
-              {/* Venue */}
-              <div className="mb-4">
-                <h3 className="mb-4!">Select Route</h3>
-                <FormField
-                  control={form.control}
-                  name="transportation"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Select {...field}>
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select Route" />
-                          </SelectTrigger>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <div className="flex items-center gap-2 mb-6!">
+                <MapPin className="w-4 h-4 text-primary" />
+                <h2 className="text-lg font-semibold text-primary">
+                  Venue Information
+                </h2>
               </div>
+
+              <FormField
+                control={form.control}
+                name="venueName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-white">Venue Name *</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="eg. Auckland Convention Centre"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="rounded-lg p-6!">
+              {/* Transportation Routes */}
+              {isPending ? (
+                <div
+                  className={`flex justify-center items-center h-24 mx-auto`}
+                >
+                  <Loader2Icon className={`animate-spin`} />
+                </div>
+              ) : (
+                <div className="mb-4 space-y-6">
+                  <h3 className="mb-4!">Select Routes</h3>
+
+                  {selectedRoutes.map((routeId, index) => (
+                    <FormField
+                      key={index}
+                      control={form.control}
+                      name={`transports.${index}`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex items-center gap-3">
+                            <FormControl className="flex-1">
+                              <Select
+                                value={field.value}
+                                onValueChange={field.onChange}
+                              >
+                                <SelectTrigger className="w-full py-4 px-3 h-auto!">
+                                  <SelectValue placeholder="Select Route" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {data.data
+                                    .filter(
+                                      (x: idk) =>
+                                        !selectedRoutes.includes(x._id) ||
+                                        x._id === field.value
+                                    )
+                                    .map((x: idk) => (
+                                      <SelectItem key={x._id} value={x._id}>
+                                        <div className="flex items-center gap-3">
+                                          {/* Pickup */}
+                                          <div className="flex-1 min-w-0">
+                                            <p className="truncate font-medium text-foreground">
+                                              {x.pickUpPoint.name.length > 50
+                                                ? x.pickUpPoint.name.slice(
+                                                    0,
+                                                    50
+                                                  ) + "…"
+                                                : x.pickUpPoint.name}
+                                            </p>
+                                            <span className="text-xs text-muted-foreground">
+                                              Pickup
+                                            </span>
+                                          </div>
+                                          <ArrowDown className="size-4 shrink-0 text-muted-foreground rotate-[-90deg]" />
+                                          {/* Dropoff */}
+                                          <div className="flex-1 min-w-0 text-right">
+                                            <p className="truncate font-medium text-foreground">
+                                              {x.dropOffPoint.name.length > 50
+                                                ? x.dropOffPoint.name.slice(
+                                                    0,
+                                                    50
+                                                  ) + "…"
+                                                : x.dropOffPoint.name}
+                                            </p>
+                                            <span className="text-xs text-muted-foreground">
+                                              Dropoff
+                                            </span>
+                                          </div>
+                                        </div>
+                                      </SelectItem>
+                                    ))}
+                                </SelectContent>
+                              </Select>
+                            </FormControl>
+
+                            {/* ✅ Remove Route Button */}
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              onClick={() => removeRoute(index)}
+                              className="shrink-0"
+                            >
+                              Remove
+                            </Button>
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  ))}
+
+                  <div className="flex justify-end items-center mt-6">
+                    <Button
+                      type="button"
+                      onClick={addRoute}
+                      className="rounded-md!"
+                    >
+                      Add Route
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Seating & Pricing Section */}
@@ -281,12 +481,19 @@ export default function CreateEventPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
-                  name="totalSeats"
+                  name="totalSeat"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-white">Total seat *</FormLabel>
                       <FormControl>
-                        <Input placeholder="eg. 10" {...field} />
+                        <Input
+                          type="number"
+                          placeholder="eg. 10"
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(Number.parseInt(e.target.value) || 0)
+                          }
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -302,7 +509,17 @@ export default function CreateEventPage() {
                         Ticket Price (NZD) *
                       </FormLabel>
                       <FormControl>
-                        <Input placeholder="eg. $25" {...field} />
+                        <Input
+                          type="number"
+                          step="0.01"
+                          placeholder="eg. 25"
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(
+                              Number.parseFloat(e.target.value) || 0
+                            )
+                          }
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -325,7 +542,7 @@ export default function CreateEventPage() {
                   {form.getValues("image") ? (
                     <div className="w-full aspect-video rounded-lg flex items-center justify-center">
                       <Image
-                        src={form.getValues("image")}
+                        src={form.getValues("image") || "/placeholder.svg"}
                         fill
                         alt="thumbnail"
                       />
@@ -374,10 +591,12 @@ export default function CreateEventPage() {
 
               <FormField
                 control={form.control}
-                name="eventStatus"
+                name="websiteStatus"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-white">Event status *</FormLabel>
+                    <FormLabel className="text-white">
+                      Website status *
+                    </FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
@@ -389,9 +608,7 @@ export default function CreateEventPage() {
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="upcoming">Upcoming</SelectItem>
-                        <SelectItem value="active">Active</SelectItem>
-                        <SelectItem value="completed">Completed</SelectItem>
-                        <SelectItem value="cancelled">Cancelled</SelectItem>
+                        <SelectItem value="featured">Featured</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -406,7 +623,7 @@ export default function CreateEventPage() {
                 type="button"
                 variant="outline"
                 onClick={onCancel}
-                className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                className="border-gray-600 text-gray-300 hover:bg-gray-700 bg-transparent"
               >
                 Cancel
               </Button>
@@ -414,7 +631,7 @@ export default function CreateEventPage() {
                 type="button"
                 variant="outline"
                 onClick={onSaveDraft}
-                className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                className="border-gray-600 text-gray-300 hover:bg-gray-700 bg-transparent"
               >
                 Save as Draft
               </Button>

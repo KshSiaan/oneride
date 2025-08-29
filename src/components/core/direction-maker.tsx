@@ -8,10 +8,14 @@ export function Direction({
   pick,
   drop,
   setRouteData,
+  type,
+  noRoute,
 }: {
   pick: { lat: number; lng: number };
   drop: { lat: number; lng: number };
   setRouteData?: (leg: google.maps.DirectionsLeg) => void;
+  type?: "busRoute" | "parkAndRide" | "pubPickup";
+  noRoute?: boolean;
 }) {
   const map = useMap();
   const routesLibrary = useMapsLibrary("routes");
@@ -30,13 +34,13 @@ export function Direction({
       map,
       polylineOptions: {
         strokeColor: "#FF4081",
-        strokeWeight: 6,
-        strokeOpacity: 0.8,
+        strokeWeight: 4,
+        strokeOpacity: noRoute ? 0 : 0.6,
       },
       suppressMarkers: true,
     });
     setDirectionRenderer(renderer);
-  }, [map, routesLibrary]);
+  }, [map, noRoute, routesLibrary]);
 
   useEffect(() => {
     if (!directionService || !directionRenderer) return;
@@ -78,7 +82,8 @@ export function Direction({
           lng: route?.legs[0]?.start_location.lng() ?? 0,
         }}
         icon={{
-          url: "/icon/route-pin.svg",
+          url:
+            type === "pubPickup" ? "/icon/pub-pin.svg" : "/icon/route-pin.svg",
           scaledSize: {
             height: 35,
             width: 35,

@@ -3,7 +3,7 @@ import { getOwnProfileApi } from "@/lib/api/core";
 import { idk } from "@/lib/utils";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 export const metadata: Metadata = {
   title: "OneRide Admin Panel",
 };
@@ -22,7 +22,7 @@ export default async function RootLayout({
   const me: idk = await getOwnProfileApi(token);
 
   if (!me.data.roles.includes("admin")) {
-    return notFound();
+    return redirect("/");
   }
 
   return (

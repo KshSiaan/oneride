@@ -422,6 +422,10 @@ export const getEventsApi = async (
   return howl(`/events${query}`, { token });
 };
 
+export const getEventById = async (id:string) => {
+    return howl(`/events/${id}`, { method: "GET"})
+}
+
 
 // >>>>>>>>>>> Charter <<<<<<<<<<<<<
 
@@ -680,10 +684,16 @@ export const getDashboardApi = async (token: string) => {
 }
 
 // >>>>>>>>>>> TRANSPORTATION <<<<<<<<<<<<<
+export const getPickupsApi = async (type?: string) => {
+  const params = new URLSearchParams();
+  if (type) params.append("type", type);
 
-export const getPickupsApi = async (token: string,type?:string) => {
-    return howl(`/transports?type=${type}`, { method: "GET", token });
-}
+  const queryString = params.toString();
+  const url = `/transports${queryString ? `?${queryString}` : ""}`;
+
+  return howl(url, { method: "GET" });
+};
+
 
 export const createPickupsApi = async (body:{
   type:string,
@@ -704,3 +714,6 @@ export const createPickupsApi = async (body:{
     return howl(`/transports`, {body, method: "POST", token });
 }
 
+export const deletePickupsApi = async (id:string) => {
+  return howl(`/transports/${id}`, { method: "DELETE" });
+};
