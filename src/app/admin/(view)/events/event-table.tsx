@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { EditIcon, TrashIcon, Users2Icon } from "lucide-react";
+import { TrashIcon } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -18,13 +18,32 @@ import {
 import { CardDescription } from "@/components/ui/card";
 import { PopoverArrow, PopoverClose } from "@radix-ui/react-popover";
 import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
+
 import { idk } from "@/lib/utils";
 import { dateExtractor, timeExtractor } from "@/lib/func/functions";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteEventApi } from "@/lib/api/core";
+import { useCookies } from "react-cookie";
+import { toast } from "sonner";
 
 export default function EventTable({ data }: { data: idk }) {
   console.log(data.data);
+  const [cookies] = useCookies(["token"]);
+  const qCl = useQueryClient();
   const customers = data.data;
+  const { mutate } = useMutation({
+    mutationKey: ["delete_event"],
+    mutationFn: (id: string) => {
+      return deleteEventApi(id, cookies.token);
+    },
+    onError: (err) => {
+      toast.error(err.message ?? "Failed to complete this request");
+    },
+    onSuccess: (data: idk) => {
+      toast.success(data.message ?? "Successfully deleted this event");
+      qCl.invalidateQueries({ queryKey: ["events"] });
+    },
+  });
   return (
     <>
       <Table className="mt-12!">
@@ -59,11 +78,11 @@ export default function EventTable({ data }: { data: idk }) {
                 </Badge>
               </TableCell>
               <TableCell className="text-center !space-x-2">
-                <Button variant="ghost" size="icon" asChild>
+                {/* <Button variant="ghost" size="icon" asChild>
                   <Link href={"events/edit"}>
                     <EditIcon />
                   </Link>
-                </Button>
+                </Button> */}
 
                 <Popover>
                   <PopoverTrigger asChild>
@@ -83,47 +102,27 @@ export default function EventTable({ data }: { data: idk }) {
                       be undone.
                     </CardDescription>
                     <PopoverClose asChild>
-                      <Button variant="destructive" className="text-sm !mt-6">
+                      <Button
+                        variant="destructive"
+                        className="text-sm !mt-6"
+                        onClick={() => {
+                          mutate(x._id);
+                        }}
+                      >
                         <TrashIcon />
                         Delete
                       </Button>
                     </PopoverClose>
                   </PopoverContent>
                 </Popover>
-                <Button variant="ghost" size="icon">
+                {/* <Button variant="ghost" size="icon">
                   <Users2Icon />
-                </Button>
+                </Button> */}
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
-      {/* <div className="w-full flex flex-row justify-between items-center mt-12!">
-        <div className=""></div>
-        <Pagination className="mt-12">
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious href="#" />
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLink href="#">1</PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLink href="#">2</PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLink href="#">3</PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationNext href="#" />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-        <Button variant={"outline"} className="rounded">
-          <FileDownIcon />
-          Export PDF
-        </Button>
-      </div> */}
     </>
   );
 }

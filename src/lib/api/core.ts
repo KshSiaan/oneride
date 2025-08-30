@@ -17,7 +17,7 @@ export const deleteCategoryApi = async (id: string, token: string) => {
 }
 
 export const getCategoriesApi = async () => {
-    return howl("/categories", { method: "GET" })
+    return howl("/categories")
 }
 
 // >>>>>>>>>>> Blog <<<<<<<<<<<<<
@@ -392,8 +392,39 @@ export const getTeamMembersApi = async ({ status, type }: { status?: string; typ
 // >>>>>>>>>>> Event <<<<<<<<<<<<<
 
 export const createEventApi = async (body: FormData, token: string) => {
-    return howl("/events", { method: "POST", body, token })
-}
+  // log FormData keys + values
+  // for (const [key, value] of body.entries()) {
+  //   if (value instanceof File) {
+  //     console.log(key, {
+  //       name: value.name,
+  //       size: value.size,
+  //       type: value.type,
+  //     });
+  //   } else {
+  //     console.log(key, value);
+  //   }
+  // }
+
+  const res = await fetch(`${base_api}/events`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body,
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Request failed: ${res.status} - ${text}`);
+  }
+
+  return res.json();
+};
+
+
+
+
 
 export const deleteEventApi = async (id: string, token: string) => {
     return howl(`/events/${id}`, { method: "DELETE", token })
@@ -682,6 +713,11 @@ export const deleteFaqApi = async (id: string, token: string) => {
 export const getDashboardApi = async (token: string) => {
     return howl("/dashboard/overview", { method: "GET", token });
 }
+export const getStatsApi= async (period:string,token: string) => {
+    return howl(`/dashboard/earnings?period=${period}`, { method: "GET", token });
+}
+
+
 
 // >>>>>>>>>>> TRANSPORTATION <<<<<<<<<<<<<
 export const getPickupsApi = async (type?: string) => {
@@ -694,6 +730,9 @@ export const getPickupsApi = async (type?: string) => {
   return howl(url, { method: "GET" });
 };
 
+export const getPickupById = async (id:string) => {
+  return howl(`/transports/${id}`, { method: "GET" });
+};
 
 export const createPickupsApi = async (body:{
   type:string,

@@ -18,8 +18,6 @@ export default function Directory() {
     },
   });
 
-  
-  
   return (
     <div className="min-h-screen p-4!">
       <div className="mx-auto!">
@@ -49,7 +47,7 @@ export default function Directory() {
               ) : (
                 data.data.map((user: idk) => (
                   <div
-                    key={user.id}
+                    key={user._id}
                     className="flex items-center justify-between p-4! hover:bg-secondary transition-colors"
                   >
                     <div className="flex items-center gap-4">

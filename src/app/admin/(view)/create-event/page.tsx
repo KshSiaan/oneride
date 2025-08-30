@@ -32,10 +32,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import Image from "next/image";
 import Link from "next/link";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { createEventApi, getPickupsApi } from "@/lib/api/core";
+import {
+  createEventApi,
+  getCategoriesApi,
+  getPickupsApi,
+} from "@/lib/api/core";
 import type { idk } from "@/lib/utils";
 import { useCookies } from "react-cookie";
 import { toast } from "sonner";
@@ -49,12 +52,13 @@ const formSchema = z.object({
   startTime: z.string().min(1, "Start time is required"),
   endTime: z.string().min(1, "End time is required"),
   venueName: z.string().min(1, "Venue name is required"),
-  totalSeat: z.number().min(1, "Total seats is required"),
-  ticketPrice: z.number().min(1, "Ticket price is required"),
+  totalSeat: z.string().min(1, "Total seats is required"),
+  ticketPrice: z.string().min(1, "Ticket price is required"),
   adminStatus: z.enum(["active", "draft", "ended"]),
   websiteStatus: z.enum(["upcoming", "featured"]),
-  transports: z.array(z.string().min(1)),
-  image: z.any().optional(),
+  transportation: z.array(z.string().min(1)),
+  eventStatus: z.enum(["active", "inactive", "ended"]),
+  image: z.any(),
 });
 
 export default function CreateEventPage() {
@@ -66,57 +70,56 @@ export default function CreateEventPage() {
     },
   });
 
+  const { data: categories, isPending: categoryPending }: idk = useQuery({
+    queryKey: ["categories"],
+    queryFn: getCategoriesApi,
+  });
   const { mutate } = useMutation({
     mutationKey: ["add_event"],
-    mutationFn: (data: {
-      title: string;
-      category: string;
-      description: string;
-      startDate: string;
-      endDate: string;
-      startTime: string;
-      endTime: string;
-      venueName: string;
-      transportation: string[];
-      totalSeats: string;
-      ticketPrice: string;
-      eventStatus: string;
-      adminStatus: string;
-      websiteStatus: string;
-      image?: File;
+    mutationFn: ({
+      data,
+      adminStat,
+    }: {
+      data: z.infer<typeof formSchema>;
+      adminStat: string;
     }) => {
-      console.log(data);
-
       const formData = new FormData();
+
+      const startDateTime = new Date(
+        `${data.startDate}T${data.startTime}:00Z`
+      ).toISOString();
+      const endDateTime = new Date(
+        `${data.endDate}T${data.endTime}:00Z`
+      ).toISOString();
 
       formData.append("title", data.title);
       formData.append("category", data.category);
       formData.append("description", data.description);
-      formData.append("startDate", data.startDate);
-      formData.append("endDate", data.endDate);
-      formData.append("startTime", data.startTime);
-      formData.append("endTime", data.endTime);
+      formData.append("startDate", startDateTime);
+      formData.append("endDate", endDateTime);
+      formData.append("startTime", startDateTime);
+      formData.append("endTime", endDateTime);
       formData.append("venueName", data.venueName);
-      formData.append("totalSeats", data.totalSeats);
+      formData.append("totalSeat", data.totalSeat);
       formData.append("ticketPrice", data.ticketPrice);
-      formData.append("eventStatus", data.eventStatus);
-      formData.append("adminStatus", data.adminStatus);
+      formData.append("adminStatus", adminStat);
       formData.append("websiteStatus", data.websiteStatus);
+      formData.append("eventStatus", data.eventStatus);
+      formData.append("transports", JSON.stringify(data.transportation));
 
-      // Transportation array -> convert to JSON string
-      formData.append("transportation", JSON.stringify(data.transportation));
-
-      // Image if exists
-      if (data.image) formData.append("image", data.image);
+      if (data.image instanceof File) {
+        formData.append("image", data.image);
+      }
 
       return createEventApi(formData, cookies.token);
     },
+
     onError: (err) => {
       toast.error(err.message ?? "Failed to complete this request");
-      console.log(err);
     },
     onSuccess: (data: idk) => {
       toast.success(data.message ?? "Event Created Successfully");
+      form.reset();
     },
   });
 
@@ -131,52 +134,41 @@ export default function CreateEventPage() {
       startTime: "",
       endTime: "",
       venueName: "",
-      transports: [],
-      totalSeat: 0,
-      ticketPrice: 0,
+      transportation: [],
+      totalSeat: "0", // ✅ string
+      ticketPrice: "0", // ✅ string
       adminStatus: "draft",
       websiteStatus: "upcoming",
+      eventStatus: "active", // ✅ default
       image: undefined,
     },
   });
 
-  const selectedRoutes = form.watch("transports");
+  const selectedRoutes = form.watch("transportation");
 
   // Add new empty select
   function addRoute() {
-    form.setValue("transports", [...selectedRoutes, ""]);
+    form.setValue("transportation", [...selectedRoutes, ""]);
   }
 
   // Remove a select if needed (optional)
   function removeRoute(index: number) {
     const updated = [...selectedRoutes];
     updated.splice(index, 1);
-    form.setValue("transports", updated);
+    form.setValue("transportation", updated);
   }
-
-  const onSubmit = (data: z.infer<typeof formSchema>, isDraft = false) => {
-    const submitData = {
-      ...data,
-      adminStatus: isDraft ? "draft" : "active",
-      totalSeats: data.totalSeat.toString(),
-      ticketPrice: data.ticketPrice.toString(),
-      transportation: data.transports,
-      eventStatus: data.websiteStatus,
-      websiteStatus: data.websiteStatus,
-    };
-    console.log("Submitted:", submitData);
-    mutate(submitData);
+  const onSubmit = (data: z.infer<typeof formSchema>) => {
+    mutate({ data, adminStat: "active" });
   };
 
   function onSaveDraft() {
-    form.handleSubmit((data) => onSubmit(data, true))();
+    mutate({ data, adminStat: "draft" });
   }
 
   function onCancel() {
     console.log("Cancelling...");
     form.reset();
   }
-
   return (
     <div className="min-h-screen bg-muted rounded-md text-white p-6!">
       <div className="w-full !mx-auto">
@@ -192,7 +184,7 @@ export default function CreateEventPage() {
         </div>
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit((data) => onSubmit(data, false))}
+            onSubmit={form.handleSubmit((data) => onSubmit(data))}
             className="space-y-6!"
           >
             {/* Event Information Section */}
@@ -223,7 +215,6 @@ export default function CreateEventPage() {
                     </FormItem>
                   )}
                 />
-
                 <FormField
                   control={form.control}
                   name="category"
@@ -239,13 +230,15 @@ export default function CreateEventPage() {
                             <SelectValue placeholder="Select category" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent>
-                          <SelectItem value="shuttle">
-                            Shuttle Service
-                          </SelectItem>
-                          <SelectItem value="bus">Bus Service</SelectItem>
-                          <SelectItem value="taxi">Taxi Service</SelectItem>
-                        </SelectContent>
+                        {!categoryPending && (
+                          <SelectContent>
+                            {categories.data.map((x: idk) => (
+                              <SelectItem value={x._id} key={x._id}>
+                                {x.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        )}
                       </Select>
                       <FormMessage />
                     </FormItem>
@@ -382,7 +375,7 @@ export default function CreateEventPage() {
                     <FormField
                       key={index}
                       control={form.control}
-                      name={`transports.${index}`}
+                      name={`transportation.${index}`}
                       render={({ field }) => (
                         <FormItem>
                           <div className="flex items-center gap-3">
@@ -490,9 +483,7 @@ export default function CreateEventPage() {
                           type="number"
                           placeholder="eg. 10"
                           {...field}
-                          onChange={(e) =>
-                            field.onChange(Number.parseInt(e.target.value) || 0)
-                          }
+                          onChange={(e) => field.onChange(e.target.value || 0)}
                         />
                       </FormControl>
                       <FormMessage />
@@ -514,11 +505,7 @@ export default function CreateEventPage() {
                           step="0.01"
                           placeholder="eg. 25"
                           {...field}
-                          onChange={(e) =>
-                            field.onChange(
-                              Number.parseFloat(e.target.value) || 0
-                            )
-                          }
+                          onChange={(e) => field.onChange(e.target.value || 0)}
                         />
                       </FormControl>
                       <FormMessage />
@@ -539,19 +526,9 @@ export default function CreateEventPage() {
 
               <div className="border-2 border-dashed border-zinc-700 rounded-lg p-12! text-center">
                 <div className="flex flex-col items-center gap-4">
-                  {form.getValues("image") ? (
-                    <div className="w-full aspect-video rounded-lg flex items-center justify-center">
-                      <Image
-                        src={form.getValues("image") || "/placeholder.svg"}
-                        fill
-                        alt="thumbnail"
-                      />
-                    </div>
-                  ) : (
-                    <div className="w-12 h-12 rounded-lg flex items-center justify-center">
-                      <ImageIcon className="w-6 h-6 " />
-                    </div>
-                  )}
+                  <div className="w-12 h-12 rounded-lg flex items-center justify-center">
+                    <ImageIcon className="w-6 h-6 " />
+                  </div>
                   <div>
                     <p className="text-white mb-1!">
                       Drag & drop your event image here

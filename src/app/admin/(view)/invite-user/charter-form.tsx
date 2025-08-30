@@ -1,11 +1,19 @@
 "use client";
 
-import type React from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -14,98 +22,131 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useMutation } from "@tanstack/react-query";
+import { createInvitationApi } from "@/lib/api/core";
+import { useCookies } from "react-cookie";
+import { toast } from "sonner";
+import { idk } from "@/lib/utils";
+import { Loader2Icon } from "lucide-react";
+
+// Zod schema
+const formSchema = z.object({
+  fullName: z.string().min(1, "Full name is required"),
+  email: z.string().email("Invalid email address"),
+  role: z.enum(["viewer"]),
+  optionalMessage: z.string().optional(),
+});
 
 export default function CharterForm() {
-  const [formData, setFormData] = useState({
-    clientName: "",
-    email: "",
-    phone: "",
-    passengers: "",
-    pickupLocation: "",
-    dropoffLocation: "",
-    pickupDate: "",
-    pickupTime: "",
-    purpose: "",
-    instructions: "",
+  const [cookies] = useCookies(["token"]);
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      fullName: "",
+      email: "",
+      role: "viewer",
+      optionalMessage: "",
+    },
+  });
+  const { mutate, isPending } = useMutation({
+    mutationKey: ["invite_user"],
+    mutationFn: (data: {
+      fullName: string;
+      email: string;
+      role: string;
+      optionalMessage?: string | undefined;
+    }) => {
+      return createInvitationApi(data, cookies.token);
+    },
+    onError: (err) => {
+      toast.error(err.message ?? "Failed to complete this request");
+    },
+    onSuccess: (data: idk) => {
+      toast.success(data.message ?? "User Invited Successfully!");
+    },
   });
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Form submitted:", formData);
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    // console.log("Form submitted:", values);
+    mutate(values);
   };
 
   return (
-    <div className="w-full mx-auto! text-foreground p-6! rounded-lg">
-      <form onSubmit={handleSubmit} className="space-y-6!">
-        <div className="space-y-2!">
-          <Label htmlFor="clientName" className="text-foreground">
-            Full name
-          </Label>
-          <Input
-            id="clientName"
-            type="text"
-            placeholder="John"
-            value={formData.clientName}
-            onChange={(e) => handleInputChange("clientName", e.target.value)}
-            className="bg-background border-foreground/20 text-foreground placeholder:text-foreground/50"
-            required
-          />
-        </div>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-6">
+        <FormField
+          control={form.control}
+          name="fullName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Full Name</FormLabel>
+              <FormControl>
+                <Input placeholder="John Doe" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-        <div className="space-y-2!">
-          <Label htmlFor="email" className="text-foreground">
-            Email Address
-          </Label>
-          <Input
-            id="email"
-            type="email"
-            placeholder="John@gmail.com"
-            value={formData.email}
-            onChange={(e) => handleInputChange("email", e.target.value)}
-            className="bg-background border-foreground/20 text-foreground placeholder:text-foreground/50"
-            required
-          />
-        </div>
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email Address</FormLabel>
+              <FormControl>
+                <Input placeholder="john@gmail.com" type="email" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-        <div className="space-y-2!">
-          <Label htmlFor="instructions" className="text-foreground">
-            Role
-          </Label>
-          <Select>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select a Role" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="light">Light</SelectItem>
-              <SelectItem value="dark">Dark</SelectItem>
-              <SelectItem value="system">System</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2!">
-          <Label htmlFor="instructions" className="text-foreground">
-            Optional Message
-          </Label>
-          <Textarea
-            id="instructions"
-            placeholder="Give any instruction"
-            value={formData.instructions}
-            onChange={(e) => handleInputChange("instructions", e.target.value)}
-            className="bg-background border-foreground/20 text-foreground placeholder:text-foreground/50 min-h-[100px]"
-            rows={4}
-          />
-        </div>
+        <FormField
+          control={form.control}
+          name="role"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Role</FormLabel>
+              <FormControl>
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a Role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="viewer">Viewer</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-        <div className="w-full flex justify-end items-center gap-6">
-          <Button type="submit" className=" text-foreground">
-            Send Invitation
+        <FormField
+          control={form.control}
+          name="optionalMessage"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Optional Message</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Give any instructions"
+                  {...field}
+                  className="min-h-[100px]"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="flex justify-end">
+          <Button type="submit">
+            {isPending ? <Loader2Icon /> : "Send Invitation"}
           </Button>
         </div>
       </form>
-    </div>
+    </Form>
   );
 }
