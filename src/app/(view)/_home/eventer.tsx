@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
-import { getCategoriesApi, getEventsApi, getPickupById } from "@/lib/api/core";
+import { getCategoriesApi, getEventById, getEventsApi } from "@/lib/api/core";
 import { useCookies } from "react-cookie";
 import { idk } from "@/lib/utils";
 import MapBase from "@/components/core/map";
@@ -29,16 +29,24 @@ export default function Eventer() {
       return getEventsApi(cookies.token, { category });
     },
   });
-  const { data: transport, isPending: transportLoading } = useQuery({
-    queryKey: ["transport", currentEvent],
+  const { data: event, isPending: eventLoading } = useQuery({
+    queryKey: ["event", currentEvent],
     queryFn: (): idk => {
-      return getPickupById(JSON.parse(currentEvent as string)[0]);
+      return getEventById(currentEvent!, true);
     },
     enabled: !!currentEvent,
   });
+
   return (
     <>
       <div className="w-full space-y-6!">
+        {!eventLoading && (
+          <pre className="bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 text-amber-400 rounded-xl p-6 shadow-lg overflow-x-auto text-sm leading-relaxed border border-zinc-700">
+            <code className="whitespace-pre-wrap">
+              {JSON.stringify(event, null, 2)}
+            </code>
+          </pre>
+        )}
         <h1 className="text-2xl lg:text-5xl text-center">Find Your Bus Ride</h1>
         <h3 className=" px-2! text-sm lg:text-2xl text-center">
           Choose your event and see available pickup points near you.
@@ -55,7 +63,7 @@ export default function Eventer() {
             {!isPending && (
               <SelectContent>
                 {data.data.map((x: idk) => (
-                  <SelectItem key={x._id} value={JSON.stringify(x.transports)}>
+                  <SelectItem key={x._id} value={x._id}>
                     {x.title}
                   </SelectItem>
                 ))}
@@ -90,7 +98,7 @@ export default function Eventer() {
           </code>
         </pre>
       )} */}
-      {!transportLoading ? (
+      {/* {!transportLoading ? (
         <MapBase className="h-[60dvh] mt-12">
           {transport?.data && (
             <Direction
@@ -107,7 +115,7 @@ export default function Eventer() {
         </MapBase>
       ) : (
         <MapBase className="h-[60dvh] mt-12"></MapBase>
-      )}
+      )} */}
     </>
   );
 }

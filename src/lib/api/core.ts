@@ -436,6 +436,7 @@ type GetEventsParams = {
   adminStatus?: string;
   filterByQuarter?: string;
   id?: string;
+  
 };
 
 export const getEventsApi = async (
@@ -453,9 +454,13 @@ export const getEventsApi = async (
   return howl(`/events${query}`, { token });
 };
 
-export const getEventById = async (id:string) => {
-    return howl(`/events/${id}`, { method: "GET"})
-}
+export const getEventById = async (id: string, transport?: boolean) => {
+  return howl(
+    `/events/${id}${transport ? "?transport=true" : ""}`,
+    { method: "GET" }
+  );
+};
+
 
 
 // >>>>>>>>>>> Charter <<<<<<<<<<<<<
