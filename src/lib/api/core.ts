@@ -456,7 +456,7 @@ export const getEventsApi = async (
 
 export const getEventById = async (id: string, transport?: boolean) => {
   return howl(
-    `/events/${id}${transport ? "?transport=true" : ""}`,
+    `/events/${id}${transport ? "?transports=true" : ""}`,
     { method: "GET" }
   );
 };
@@ -536,17 +536,16 @@ export const getInvitationsApi = async (
 // >>>>>>>>>>> Booking <<<<<<<<<<<<<
 
 export const createBookingAuthApi = async (
-    body: { event: string; transport: string; ticketCount: number },
+    body: { event: string; transport: string; ticketCount: string},
     token: string
 ) => {
     return howl("/bookings/auth-user", { method: "POST", body, token })
 }
 
 export const createBookingGuestApi = async (
-    body: { firstName: string; lastName: string; phone: string; email: string; gender: string; event: string; transport: string; ticketCount: number },
-    token: string
+    body: { firstName: string; lastName: string; phone: string; email: string; gender: string; event: string; transport: string; ticketCount: string }
 ) => {
-    return howl("/bookings/guest-user", { method: "POST", body, token })
+    return howl("/bookings/guest-user", { method: "POST", body,})
 }
 
 export const getBookingsApi = async (
@@ -573,9 +572,9 @@ export const deleteBookingApi = async (id: string, token: string) => {
 
 export const createPaymentIntentApi = async (
     body: { amount: number; bookingId: string },
-    token: string
+
 ) => {
-    return howl("/payments/intents", { method: "POST", body, token })
+    return howl("/payments/intents", { method: "POST", body })
 }
 
 export const confirmPaymentByIntentApi = async (
@@ -752,8 +751,8 @@ export const createPickupsApi = async (body:{
     lng:string
   },
   duration:string,
-  departureTime:string
-
+  departureTime:string,
+  price:string
 },token: string,) => {
     return howl(`/transports`, {body, method: "POST", token });
 }

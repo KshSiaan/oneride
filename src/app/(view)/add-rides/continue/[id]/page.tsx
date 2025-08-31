@@ -2,9 +2,19 @@ import { Button } from "@/components/ui/button";
 import { ChevronRightIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import React from "react";
 
-export default function Page() {
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const param = await params;
+  const id = param.id;
+  if (!id) {
+    return notFound();
+  }
   return (
     <main className="w-full flex flex-col justify-center items-center my-12! space-y-6! font-serif">
       <Image
@@ -30,7 +40,7 @@ export default function Page() {
           className="lg:w-1/2 text-lg text-foreground py-6! flex justify-between items-center rounded-lg"
           asChild
         >
-          <Link href="/add-rides/details">
+          <Link href={`/add-rides/details?id=${id}`}>
             <span>Continue As Guest</span>
             <span className="size-6 text-primary rounded-full bg-foreground flex flex-row justify-center items-center">
               <ChevronRightIcon />

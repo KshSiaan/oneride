@@ -40,13 +40,6 @@ export default function Eventer() {
   return (
     <>
       <div className="w-full space-y-6!">
-        {!eventLoading && (
-          <pre className="bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 text-amber-400 rounded-xl p-6 shadow-lg overflow-x-auto text-sm leading-relaxed border border-zinc-700">
-            <code className="whitespace-pre-wrap">
-              {JSON.stringify(event, null, 2)}
-            </code>
-          </pre>
-        )}
         <h1 className="text-2xl lg:text-5xl text-center">Find Your Bus Ride</h1>
         <h3 className=" px-2! text-sm lg:text-2xl text-center">
           Choose your event and see available pickup points near you.
@@ -89,33 +82,46 @@ export default function Eventer() {
             )}
           </Select>
         </div>
-        {/* {currentEvent} */}
       </div>
-      {/* {!transportLoading && (
-        <pre className="bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 text-amber-400 rounded-xl p-6 shadow-lg overflow-x-auto text-sm leading-relaxed border border-zinc-700">
-          <code className="whitespace-pre-wrap">
-            {JSON.stringify(transport, null, 2)}
-          </code>
-        </pre>
-      )} */}
-      {/* {!transportLoading ? (
-        <MapBase className="h-[60dvh] mt-12">
-          {transport?.data && (
-            <Direction
-              pick={{
-                lat: transport.data.pickUpPoint.lat,
-                lng: transport.data.pickUpPoint.lng,
-              }}
-              drop={{
-                lat: transport.data.dropOffPoint.lat,
-                lng: transport.data.dropOffPoint.lng,
-              }}
-            />
-          )}
-        </MapBase>
+      {!eventLoading ? (
+        <>
+          <MapBase className="h-[60dvh] mt-12">
+            {event.data.transports.map(
+              (x: {
+                _id: string;
+                type: "busRoute" | "parkAndRide" | "pubPickup" | undefined;
+                pickUpPoint: {
+                  name: string;
+                  lat: number;
+                  lng: number;
+                  _id: string;
+                };
+                dropOffPoint: {
+                  name: string;
+                  lat: number;
+                  lng: number;
+                  _id: string;
+                };
+              }) => (
+                <Direction
+                  key={x._id}
+                  pick={{
+                    lat: x.pickUpPoint.lat,
+                    lng: x.pickUpPoint.lng,
+                  }}
+                  drop={{
+                    lat: x.dropOffPoint.lat,
+                    lng: x.dropOffPoint.lng,
+                  }}
+                  type={x.type}
+                />
+              )
+            )}
+          </MapBase>
+        </>
       ) : (
         <MapBase className="h-[60dvh] mt-12"></MapBase>
-      )} */}
+      )}
     </>
   );
 }

@@ -51,7 +51,7 @@ export default function EventTable({ data }: idk) {
           {data?.data?.map((x: idk) => (
             <TableRow key={x._id}>
               <TableCell className="text-center">{x._id}</TableCell>
-              <TableCell className="text-center">{x.event.title}</TableCell>
+              <TableCell className="text-center">{x?.event?.title}</TableCell>
               {/* <TableCell className="text-center">{x.}</TableCell> */}
               <TableCell className="text-center">{x.ticketCount}</TableCell>
               <TableCell className="text-center">

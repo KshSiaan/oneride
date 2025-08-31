@@ -55,6 +55,7 @@ export default function Page() {
     "busRoute" | "parkAndRide" | "pubPickup" | "all" | ""
   >("");
   const [departureTime, setDepartureTime] = useState("");
+  const [price, setPrice] = useState<string>("");
   const [cookies] = useCookies(["token"]);
   const { data, isPending, refetch } = useQuery({
     queryKey: ["transport", selectedPickupType],
@@ -80,6 +81,7 @@ export default function Page() {
       };
       duration: string;
       departureTime: string;
+      price: string;
     }) => createPickupsApi(data, cookies.token),
     onError: (err) => {
       toast.error(err.message ?? "Failed to complete this request");
@@ -122,6 +124,10 @@ export default function Page() {
       toast.error("Route info not loaded yet");
       return;
     }
+    if (!price) {
+      toast.error("Please give this route a valid price");
+      return;
+    }
 
     mutate({
       type: pickupType,
@@ -136,8 +142,8 @@ export default function Page() {
         lng: toLocation.lng,
       },
       duration: String(routeData.duration.value / 60),
-      // ✅ departure time formatted to ISO string
       departureTime: new Date(departureTime).toISOString(),
+      price,
     });
   };
 
@@ -203,6 +209,15 @@ export default function Page() {
                   type="datetime-local"
                   value={departureTime}
                   onChange={(e) => setDepartureTime(e.target.value)}
+                />
+              </div>
+              <div className="space-y-4">
+                <Label>Price</Label>
+                <Input
+                  type="number"
+                  placeholder="Route Price"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
                 />
               </div>
 

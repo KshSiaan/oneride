@@ -29,11 +29,11 @@ export default async function Page({
 }) {
   const storage = await searchParams;
   const id = storage.id;
-  console.log(id);
+  // console.log(id);
   if (!id) {
     return notFound();
   }
-  const call: idk = await getEventById(id);
+  const call: idk = await getEventById(id, true);
   interface Category {
     _id: string;
     name: string;
@@ -65,7 +65,7 @@ export default async function Page({
     __v: number;
   }
   const event: EventData = call.data;
-  console.log(event);
+  // console.log(event);
   return (
     <>
       <header
@@ -130,13 +130,38 @@ export default async function Page({
             </div>
           }
         >
-          <MapBase className="h-[60dvh] w-full">
-            <Direction
-              pick={{ lat: -41.3065, lng: 174.772 }}
-              drop={{ lat: -41.2128, lng: 174.8886 }}
-              type="pubPickup"
-              noRoute
-            />
+          <MapBase className="h-[60dvh]! w-full mt-12">
+            {call.data.transports.map(
+              (x: {
+                _id: string;
+                type: "busRoute" | "parkAndRide" | "pubPickup" | undefined;
+                pickUpPoint: {
+                  name: string;
+                  lat: number;
+                  lng: number;
+                  _id: string;
+                };
+                dropOffPoint: {
+                  name: string;
+                  lat: number;
+                  lng: number;
+                  _id: string;
+                };
+              }) => (
+                <Direction
+                  key={x._id}
+                  pick={{
+                    lat: x.pickUpPoint.lat,
+                    lng: x.pickUpPoint.lng,
+                  }}
+                  drop={{
+                    lat: x.dropOffPoint.lat,
+                    lng: x.dropOffPoint.lng,
+                  }}
+                  type={x.type}
+                />
+              )
+            )}
           </MapBase>
         </Suspense>
         <section className="w-full grid lg:grid-cols-8 gap-6" id="about">
@@ -216,7 +241,7 @@ export default async function Page({
             <BusFront className="text-primary mr-2! size-8" /> Available Rides
           </h2>
         </section>
-        <AvailableRides />
+        <AvailableRides data={call.data} id={id} />
         <Card className="w-full">
           <CardContent className=" flex flex-row justify-start items-center gap-4">
             <div className="size-12! aspect-square bg-primary rounded-full flex justify-center items-center text-secondary">

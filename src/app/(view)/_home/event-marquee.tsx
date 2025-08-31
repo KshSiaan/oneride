@@ -29,6 +29,7 @@ export default function EventMaquee() {
                 location={x.description}
                 startDate={dateExtractor(x.startDate)}
                 startTime={timeExtractor(x.startTime)}
+                id={x._id}
               />
             ))
           : Array.from({ length: 3 }).map((_, i) => (

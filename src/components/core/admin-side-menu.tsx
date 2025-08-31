@@ -36,6 +36,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getOwnProfileApi } from "@/lib/api/core";
 import { useCookies } from "react-cookie";
 import { imgCreator } from "@/lib/func/functions";
+import Link from "next/link";
 
 export default function AdminSideMenu() {
   const router = useRouter();
@@ -148,13 +149,15 @@ export default function AdminSideMenu() {
   ];
   return (
     <div className="flex flex-col justify-between gap-2 !pt-6 h-full">
-      <Image
-        height={100}
-        width={200}
-        alt="logo"
-        src="/logo.png"
-        className="block mx-auto! mb-6!"
-      />
+      <Link href={"/"} className="block mx-auto! mb-6!">
+        <Image
+          height={100}
+          width={200}
+          alt="logo"
+          src="/logo.png"
+          className=""
+        />
+      </Link>
       <div className="m-6! bg-secondary rounded-lg p-4! flex-1 flex flex-col justify-start items-start gap-4">
         {items.map((x, i) => (
           <div key={i} className="w-full">

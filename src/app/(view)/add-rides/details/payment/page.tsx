@@ -1,4 +1,6 @@
 "use client";
+
+import React from "react";
 import {
   Card,
   CardContent,
@@ -7,37 +9,49 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import React from "react";
-import { Elements, PaymentElement } from "@stripe/react-stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
+import PaymentForm from "./payment-form"; // ✅ your working form
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { decrypt } from "@/lib/func/functions";
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY!);
+
 export default function Page() {
-  const stripePromise = loadStripe("pk_test_qblFNYngBkEdjEZ16jxxoWSM");
+  const searcher = useSearchParams();
+  const id = searcher.get("id");
+  const p_id = searcher.get("p_id");
+  const amm = searcher.get("amm");
+  const kilo = searcher.get("kilo");
+
+  // normally you’d fetch these from query params or backend
+  const clientSecret = decrypt(kilo!); // <- real client_secret returned from backend
+  const price = amm!;
+  const bookingId = id;
+  const paymentId = p_id;
+
   return (
-    <main className="px-4! lg:px-0! min-h-dvh w-dvw flex flex-row justify-center items-center">
+    <main className="px-4 lg:px-0 min-h-dvh w-dvw flex flex-row justify-center items-center">
       <Elements
         stripe={stripePromise}
         options={{
-          mode: "payment",
-          amount: 50,
-          currency: "usd",
+          clientSecret,
           appearance: {
             theme: "night", // or "flat", "stripe", "none"
             variables: {
-              colorPrimary: "#FF4081", // Tailwind red-900 for example
+              colorPrimary: "#FF4081",
               fontFamily: "sans-serif",
-              colorBackground: "#131313", // bg-slate-900
-              colorText: "#f8fafc", // text-slate-50
+              colorBackground: "#131313",
+              colorText: "#f8fafc",
               spacingUnit: "5px",
-              borderRadius: "5px",
+              borderRadius: "8px",
             },
           },
         }}
       >
-        <Card className=" lg:w-2/3">
+        <Card className="lg:w-2/3">
           <CardHeader>
             <CardTitle>Complete Payment</CardTitle>
             <CardDescription>
@@ -45,24 +59,21 @@ export default function Page() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form>
-              <PaymentElement />
-              <span className="flex flex-row justify-start items-center gap-4 mt-6!">
-                <Checkbox />
-                <Label className="text-xs md:text-sm">
-                  I authorize this payment and agree to the Terms of Service and
-                  Privacy Policy.
-                </Label>
-              </span>
-            </form>
+            <PaymentForm
+              id={bookingId ?? ""}
+              price={price}
+              paymentId={paymentId ?? ""}
+            />
+            <span className="flex flex-row justify-start items-center gap-4 mt-6">
+              <Checkbox id="terms" />
+              <Label htmlFor="terms" className="text-xs md:text-sm">
+                I authorize this payment and agree to the Terms of Service and
+                Privacy Policy.
+              </Label>
+            </span>
           </CardContent>
           <CardFooter>
-            <Button
-              className="w-full py-6! text-base text-foreground rounded-lg"
-              asChild
-            >
-              <Link href="payment/thanks">PAY</Link>
-            </Button>
+            {/* Button lives inside PaymentForm for real stripe confirm */}
           </CardFooter>
         </Card>
       </Elements>
