@@ -1,8 +1,16 @@
 "use client";
 
 import { idk } from "@/lib/utils";
-import { Marker, useMap, useMapsLibrary } from "@vis.gl/react-google-maps";
+import {
+  InfoWindow,
+  Marker,
+  useMap,
+  useMapsLibrary,
+} from "@vis.gl/react-google-maps";
 import { useEffect, useState } from "react";
+import { Button } from "../ui/button";
+import { ChevronRight } from "lucide-react";
+import Link from "next/link";
 
 export function Direction({
   pick,
@@ -10,12 +18,14 @@ export function Direction({
   setRouteData,
   type,
   noRoute,
+  id,
 }: {
   pick: { lat: number; lng: number };
   drop: { lat: number; lng: number };
   setRouteData?: (leg: google.maps.DirectionsLeg) => void;
   type?: "busRoute" | "parkAndRide" | "pubPickup";
   noRoute?: boolean;
+  id?: string;
 }) {
   const map = useMap();
   const routesLibrary = useMapsLibrary("routes");
@@ -24,6 +34,8 @@ export function Direction({
   const [directionRenderer, setDirectionRenderer] =
     useState<google.maps.DirectionsRenderer>();
   const [route, setRoute] = useState<google.maps.DirectionsRoute>();
+
+  const [isInfoOpen, setIsInfoOpen] = useState(false); // ✅ control state
 
   useEffect(() => {
     if (!routesLibrary || !map) return;
@@ -76,6 +88,7 @@ export function Direction({
 
   return (
     <>
+      {/* Start Marker */}
       <Marker
         position={{
           lat: route?.legs[0]?.start_location.lat() ?? 0,
@@ -91,7 +104,43 @@ export function Direction({
               otherSize.width === 40 && otherSize.height === 40,
           },
         }}
+        onClick={() => setIsInfoOpen(true)} // ✅ open InfoWindow on marker click
       />
+
+      {isInfoOpen && (
+        <InfoWindow
+          position={{
+            lat: route?.legs[0]?.start_location.lat() ?? 0,
+            lng: route?.legs[0]?.start_location.lng() ?? 0,
+          }}
+          onCloseClick={() => setIsInfoOpen(false)} // ✅ close InfoWindow
+          className="font-serif"
+        >
+          <div className="w-[300px] aspect-video bg-background rounded-2xl shadow-lg p-3 flex flex-col justify-between items-center">
+            <h4 className="text-xl font-semibold text-center">
+              {route?.legs[0]?.start_address}
+            </h4>
+            <p className="text-muted-foreground">{route?.summary}</p>
+            {id ? (
+              <div className="w-full">
+                <Button
+                  className="w-full text-foreground justify-between"
+                  asChild
+                >
+                  <Link href={`/add-rides/${id}`}>
+                    <span>Review and book</span>
+                    <ChevronRight />
+                  </Link>
+                </Button>
+              </div>
+            ) : (
+              <div></div>
+            )}
+          </div>
+        </InfoWindow>
+      )}
+
+      {/* End Marker */}
       <Marker
         position={{
           lat: route?.legs[0]?.end_location.lat() ?? 0,

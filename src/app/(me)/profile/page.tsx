@@ -8,12 +8,21 @@ import { useQuery } from "@tanstack/react-query";
 import { getOwnProfileApi } from "@/lib/api/core";
 import { useCookies } from "react-cookie";
 import { idk } from "@/lib/utils";
+import { imgCreator } from "@/lib/func/functions";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import AvatarForm from "./avatar-form";
 
 export default function Page() {
   const [updating, setUpdating] = useState(false);
   const [cookies] = useCookies(["token"]);
   const { data, isPending }: idk = useQuery({
-    queryKey: ["profile"],
+    queryKey: ["user"],
     queryFn: () => {
       return getOwnProfileApi(cookies.token);
     },
@@ -34,10 +43,38 @@ export default function Page() {
       </div>
       <div className="w-full flex justify-center items-center">
         <div className="w-fit relative">
-          <Avatar className="size-[140px]">
-            <AvatarImage src={""} />
-            <AvatarFallback>UI</AvatarFallback>
-          </Avatar>
+          {isPending ? (
+            <Avatar className="size-[140px]">
+              <AvatarImage src={""} />
+              <AvatarFallback>UI</AvatarFallback>
+            </Avatar>
+          ) : (
+            <Avatar className="size-[140px]">
+              <AvatarImage
+                src={data.data.image ? imgCreator(data.data.image) : ""}
+              />
+              <AvatarFallback>UI</AvatarFallback>
+            </Avatar>
+          )}
+          {updating && (
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  className="absolute bottom-0 right-0"
+                  size={"icon"}
+                  variant={"outline"}
+                >
+                  <EditIcon />
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Update Avatar</DialogTitle>
+                </DialogHeader>
+                <AvatarForm />
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
       </div>
       <div className="">

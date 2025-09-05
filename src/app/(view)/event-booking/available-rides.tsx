@@ -109,7 +109,7 @@ export default function AvailableRides({
                         pickup={ride.pickUpPoint.name.split(",")[0]}
                         duration={`${parseInt(ride.duration).toFixed(0)} min`}
                         returner={timeExtractor(ride.departureTime)}
-                        price={`$${ride.price}`}
+                        price={ride.price ? `$${ride.price}` : null}
                       />
                     ))
                   ) : (
@@ -142,7 +142,7 @@ const RideCard = ({
   pickup?: string;
   returner?: string;
   duration?: string;
-  price?: string;
+  price?: string | null;
 }) => {
   const navig = useRouter();
   return (
@@ -174,17 +174,19 @@ const RideCard = ({
           {price ?? "N/A"}
         </p>
       </CardContent>
-      <CardFooter>
-        <Button
-          className="w-full text-white text-lg py-6 rounded-lg shadow-xl"
-          onClick={() => {
-            localStorage.setItem("selectedEvent", eventId);
-            navig.push(`/add-rides/${id}`);
-          }}
-        >
-          Review & Book
-        </Button>
-      </CardFooter>
+      {price && (
+        <CardFooter>
+          <Button
+            className="w-full text-white text-lg py-6 rounded-lg shadow-xl"
+            onClick={() => {
+              localStorage.setItem("selectedEvent", eventId);
+              navig.push(`/add-rides/${id}`);
+            }}
+          >
+            Review & Book
+          </Button>
+        </CardFooter>
+      )}
     </Card>
   );
 };

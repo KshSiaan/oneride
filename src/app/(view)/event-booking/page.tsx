@@ -149,6 +149,7 @@ export default async function Page({
                 };
               }) => (
                 <Direction
+                  id={x._id}
                   key={x._id}
                   pick={{
                     lat: x.pickUpPoint.lat,

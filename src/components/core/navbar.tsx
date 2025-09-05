@@ -19,6 +19,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { idk } from "@/lib/utils";
+import { imgCreator } from "@/lib/func/functions";
 
 export default function ResponsiveNavbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -84,7 +85,6 @@ export default function ResponsiveNavbar() {
           <div className="hidden lg:flex flex-1 justify-center gap-2 font-serif">
             <NavigationButtons />
           </div>
-          {status}
           {/* Right: User / Menu */}
           <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
             {!token ? (
@@ -105,7 +105,11 @@ export default function ResponsiveNavbar() {
                   <div className="border p-2 rounded-lg flex flex-row justify-between items-center gap-12">
                     <div className="flex items-center gap-2">
                       <Avatar>
-                        <AvatarImage src={""} />
+                        <AvatarImage
+                          src={
+                            data.data.image ? imgCreator(data.data.image) : ""
+                          }
+                        />
                         <AvatarFallback>UI</AvatarFallback>
                       </Avatar>
                       <div className="flex flex-col justify-center items-start">

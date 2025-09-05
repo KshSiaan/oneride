@@ -190,3 +190,16 @@
     @apply bg-background text-foreground;
   }
 }
+
+.gm-style-iw {
+  padding: 0 !important;
+  background: var(--background) !important;   
+  overflow: hidden !important;
+}
+.gm-style-iw-tc::after {
+  display: none !important; /* removes the little tip/arrow */
+}
+
+.gm-style-iw-d {
+  overflow: hidden !important;
+}
