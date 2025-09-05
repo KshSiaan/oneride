@@ -26,9 +26,7 @@ export function timeExtractor(x: string): string {
 export function imgCreator(x:string):string{
     if (x.includes("http")) {
         return x
-    }
-    // console.log(`${base_server}/${x}`);
-    
+    }    
     return `${base_server}/${x}`
 }
 export function timeSumUp(time: string, duration: number): string {
