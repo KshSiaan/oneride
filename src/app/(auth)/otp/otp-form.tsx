@@ -86,7 +86,6 @@ export default function AuthForms() {
   }, []);
 
   const onSubmit = (data: VerificationFormData) => {
-    console.log("Verification code submitted:", data);
     mutate({ emailVerifyCode: data.code });
   };
 

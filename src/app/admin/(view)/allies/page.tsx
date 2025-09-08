@@ -27,9 +27,6 @@ export default function Page() {
   });
 
   const pages = Array.from({ length: data?.data?.totalPages }, (_, i) => i + 1);
-  if (!isPending) {
-    console.log(data);
-  }
   return (
     <section className="p-4!">
       <div className="flex justify-between items-center w-full">

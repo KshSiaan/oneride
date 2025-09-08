@@ -27,7 +27,6 @@ import { useCookies } from "react-cookie";
 import { toast } from "sonner";
 
 export default function EventTable({ data }: { data: idk }) {
-  console.log(data.data);
   const [cookies] = useCookies(["token"]);
   const qCl = useQueryClient();
   const customers = data.data;

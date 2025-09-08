@@ -70,7 +70,6 @@ export default function SignUpForm() {
   });
 
   const onSubmit = (dataset: SignUpValues) => {
-    console.log("Sign Up Data:", dataset);
     const payload = {
       email: dataset.email,
       password: dataset.password,

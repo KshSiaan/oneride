@@ -62,7 +62,6 @@ export default function Profile({
   });
   useEffect(() => {
     if (!isPending) {
-      console.log(data);
 
       form.setValue("name", data.data.name ?? "");
       form.setValue("email", data.data.email ?? "");

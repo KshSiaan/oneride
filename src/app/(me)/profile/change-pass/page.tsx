@@ -65,7 +65,6 @@ export default function Page() {
     },
   });
   const onSubmit = (values: ChangePasswordFormValues) => {
-    console.log("Form values:", values);
     mutate(values);
   };
 

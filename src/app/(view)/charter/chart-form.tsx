@@ -89,7 +89,6 @@ export default function ChartForm() {
         },
         onSuccess: (data: idk) => {
           toast.success(data.message ?? "Successfully Requested your quote!");
-          console.log(data);
           form.reset();
           setSubmitted(true);
           navig.push(`/charter/thanks`);
@@ -100,7 +99,6 @@ export default function ChartForm() {
       toast.error("Something went wrong");
     }
 
-    // console.log(formatted);
 
     // toast(
     //   <pre className="mt-2 w-full rounded-md p-4">

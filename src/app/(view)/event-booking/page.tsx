@@ -29,7 +29,6 @@ export default async function Page({
 }) {
   const storage = await searchParams;
   const id = storage.id;
-  // console.log(id);
   if (!id) {
     return notFound();
   }
@@ -65,7 +64,6 @@ export default async function Page({
     __v: number;
   }
   const event: EventData = call.data;
-  // console.log(event);
   return (
     <>
       <header

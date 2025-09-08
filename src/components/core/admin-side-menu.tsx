@@ -178,7 +178,6 @@ export default function AdminSideMenu() {
                       openSections.settings ? "rotate-90" : "rotate-0"
                     )}
                   />
-                  {/* {console.log(openSections)} */}
                 </Button>
                 {openSections[x.key] && (
                   <div

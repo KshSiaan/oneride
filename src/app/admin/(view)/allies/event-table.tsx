@@ -46,9 +46,7 @@ interface EventTableProps {
 
 export default function EventTable({ data }: EventTableProps) {
   const [cookies] = useCookies(["token"]);
-  console.log(data);
   const dataset = data?.data.result || [];
-  console.log(dataset);
   const qClient = useQueryClient();
 
   const { mutate } = useMutation({

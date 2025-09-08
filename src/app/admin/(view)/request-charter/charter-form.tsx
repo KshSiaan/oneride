@@ -103,7 +103,6 @@ export default function CharterForm() {
     };
 
     mutate(payload); // ✅ send the correct object
-    console.log("Form submitted:", payload);
   }
 
   return (

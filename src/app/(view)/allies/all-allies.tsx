@@ -4,14 +4,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { ExternalLinkIcon } from "lucide-react";
-import { cookies } from "next/headers";
 import { getAlliesApi } from "@/lib/api/core";
 import { idk } from "@/lib/utils";
 import Link from "next/link";
 export default async function AllAllies() {
-  const token = (await cookies()).get("token")?.value;
-  const call: idk = await getAlliesApi({ page: 1 }, token ?? "");
-  console.log(call.data.result[0]);
+  const call: idk = await getAlliesApi({ page: 1 });
 
   return call.data.result.map(
     (x: { _id: string; name: string; location: string; type: string }) => (

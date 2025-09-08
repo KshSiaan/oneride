@@ -9,7 +9,6 @@ import React from "react";
 export default async function Events() {
   const token = (await cookies()).get("token")?.value;
   const call: idk = await getEventsApi(token ?? "");
-  console.log(call.data);
 
   return call.data.map(
     (x: {

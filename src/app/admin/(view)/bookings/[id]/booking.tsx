@@ -25,7 +25,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { idk } from "@/lib/utils";
 import { dateExtractor, timeExtractor } from "@/lib/func/functions";
 export default function Booking({ id }: { id: string }) {
-  //   console.log(id);
   const [cookies] = useCookies(["token"]);
   const {
     data,
@@ -64,7 +63,6 @@ export default function Booking({ id }: { id: string }) {
 
   const info = data.data;
 
-  console.log(info);
 
   const bookingData = {
     booking: {

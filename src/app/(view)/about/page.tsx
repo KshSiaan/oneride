@@ -5,28 +5,30 @@ import React, { Suspense } from "react";
 import TeamMems from "./team-mems";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
+import { getAboutUsApi } from "@/lib/api/core";
+import { imgCreator } from "@/lib/func/functions";
+import { idk } from "@/lib/utils";
 
-export default function Page() {
+export default async function Page() {
+  const call: idk = await getAboutUsApi();
+  console.log(call);
+
   return (
     <>
       <header
-        className="h-[80dvh] w-full bg-cover bg-center font-serif"
-        style={{ backgroundImage: `url('/image/about.jpg')` }}
+        className="h-[80vh] w-full bg-cover bg-center font-serif"
+        style={{ backgroundImage: `url(${imgCreator(call.data.heroImage)})` }}
       >
         <div className="h-full w-full flex justify-center items-center backdrop-blur-xs backdrop-brightness-50">
           <div className="lg:w-1/2 flex flex-col justify-around items-center gap-12 text-center">
-            <h1 className="text-3xl lg:text-6xl font-semibold">Who we are</h1>
-            <h3 className="text-sm px-4! lg:text-lg">
-              We are an event transportation platform focused on connecting
-              people to their favorite events with ease. Whether it’s a concert,
-              sports game, or special gathering, we make getting there simple
-              and stress-free. With reliable bus rides, flexible options, and a
-              focus on comfort and convenience, we&apos;re here to help you
-              enjoy the journey as much as the destination.
-            </h3>
+            <h1 className="text-3xl lg:text-6xl font-semibold">
+              {call.data.headerText}
+            </h1>
+            <h3 className="text-sm px-4! lg:text-lg">{call.data.subText}</h3>
           </div>
         </div>
       </header>
+
       <main className="my-12! px-4! lg:px-[7%]! font-serif">
         <h2 className=" text-center text-4xl">Our core team member</h2>
 

@@ -73,7 +73,6 @@ export default function Page() {
 
   const pages = Array.from({ length: data?.data?.totalPages }, (_, i) => i + 1);
   const users = data.data.result;
-  console.log(users);
 
   return (
     <section className="p-4!">

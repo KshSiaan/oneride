@@ -109,7 +109,7 @@ export default function User({ id }: { id: string }) {
             navig.push(
               `/add-rides/details/payment?id=${data.data._id}&p_id=${
                 succB.data.id
-              }&amm=${
+              }&bookingId=${succA.data._id}&amm=${
                 data.data.price * parseInt(localStorage.getItem("ticketTotal")!)
               }&kilo=${encrypt(succB.data.client_secret)}`
             );

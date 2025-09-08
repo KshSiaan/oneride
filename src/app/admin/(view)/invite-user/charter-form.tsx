@@ -67,7 +67,6 @@ export default function CharterForm() {
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    // console.log("Form submitted:", values);
     mutate(values);
   };
 

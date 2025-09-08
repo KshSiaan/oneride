@@ -31,11 +31,12 @@ export async function howl<T>(
     body: body ? JSON.stringify(body) : undefined,
   });
 
+  
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
     throw new Error((errorData as any).message || "API request failed");
   }
-
+  
   return res.json() as Promise<T>;
 }
 

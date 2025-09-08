@@ -57,7 +57,6 @@ export default function Profile({ id }: { id: string }) {
   }
 
   const user = data.data;
-  console.log(user);
 
   return (
     <>

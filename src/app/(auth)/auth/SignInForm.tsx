@@ -53,18 +53,16 @@ export default function SignInForm() {
   });
 
   const onSubmit = (values: SignInFormValues) => {
-    console.log(values);
     mutate(values, {
       onError: (err) => {
         toast.error(err?.message ?? "Something went wrong..");
       },
       onSuccess: (data: idk) => {
-        console.log(data);
+
         setCookie("token", data.data.token);
         toast.success(data.message ?? "");
         form.reset();
         push("/");
-        console.log(data);
       },
     });
   };

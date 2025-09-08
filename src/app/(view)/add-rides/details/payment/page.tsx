@@ -21,7 +21,7 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY!);
 
 export default function Page() {
   const searcher = useSearchParams();
-  const id = searcher.get("id");
+  const id = searcher.get("bookingId");
   const p_id = searcher.get("p_id");
   const amm = searcher.get("amm");
   const kilo = searcher.get("kilo");
@@ -33,13 +33,13 @@ export default function Page() {
   const paymentId = p_id;
 
   return (
-    <main className="px-4 lg:px-0 min-h-dvh w-dvw flex flex-row justify-center items-center">
+    <main className="px-4 lg:px-0 min-h-dvh py-24  w-dvw flex flex-row justify-center items-center">
       <Elements
         stripe={stripePromise}
         options={{
           clientSecret,
           appearance: {
-            theme: "night", // or "flat", "stripe", "none"
+            theme: "night",
             variables: {
               colorPrimary: "#FF4081",
               fontFamily: "sans-serif",

@@ -40,7 +40,6 @@ export default function AuthForms() {
   });
 
   const onSubmit = (values: ForgetPasswordFormValues) => {
-    console.log("Form submitted:", values);
     try {
       mutate(values.email, {
         onError: (err) => {

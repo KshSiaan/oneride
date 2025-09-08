@@ -7,11 +7,12 @@ import {
   useElements,
 } from "@stripe/react-stripe-js";
 
-import { useCookies } from "react-cookie";
+// import { useCookies } from "react-cookie";
 import { Loader2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { howl, idk } from "@/lib/utils";
+import { apiConfig } from "@/lib/config";
+import { useRouter } from "next/navigation";
 
 export default function PaymentForm({
   id,
@@ -22,11 +23,10 @@ export default function PaymentForm({
   price: string;
   paymentId: string;
 }) {
-  const [cookies] = useCookies(["ghost"]);
   const stripe = useStripe();
   const elements = useElements();
   const [isLoading, setIsLoading] = useState(false);
-
+  const navig = useRouter();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!stripe || !elements) return;
@@ -51,28 +51,33 @@ export default function PaymentForm({
     if (error) {
       toast.error(error.message);
     } else if (paymentIntent?.status === "succeeded") {
-      try {
-        const data = {
-          bookingId: id,
-          amount: price,
-          status: "success",
-          payment_intent_id: paymentId, // ✅ correct
-        };
+      const data = {
+        bookingId: id,
+        amount: price,
+        status: "success",
+        paymentIntentId: paymentId,
+      };
 
-        const result: idk = await howl("/payments/intents/transactions", {
-          token: cookies.ghost,
+      const res = await fetch(
+        `${apiConfig.baseUrl}/payments/intents/transactions`,
+        {
           method: "POST",
-          body: data,
-        });
-
-        if (!result.status) {
-          toast.error(result.message ?? "Payment failed");
-        } else {
-          toast.success(result.message ?? "Payment success");
-          window.location.href = "/subscription/payment/success";
+          headers: {
+            "Content-Type": "application/json",
+            // Authorization: `Bearer ${cookies.ghost}`,
+          },
+          body: JSON.stringify(data),
         }
-      } catch {
-        toast.error("Payment successful but couldn't log it.");
+      );
+
+      const result = await res.json();
+      console.log(result);
+
+      if (!result.success) {
+        toast.error(result.message ?? "Payment failed");
+      } else {
+        toast.success(result.message ?? "Payment success");
+        navig.push("/add-rides/details/payment/thanks");
       }
     } else {
       toast.error(

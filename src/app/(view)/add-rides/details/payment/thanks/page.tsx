@@ -1,5 +1,4 @@
-import EventCard from "@/components/core/event-card";
-import { Marquee } from "@/components/magicui/marquee";
+import EventMaquee from "@/app/(view)/_home/event-marquee";
 import Image from "next/image";
 import React from "react";
 
@@ -23,13 +22,7 @@ export default function Page() {
         <h4 className="text-xl text-center">
           Find your ride to the next big thing
         </h4>
-        <Marquee pauseOnHover className="[--duration:20s]">
-          <div className="grid grid-cols-3 gap-6 px-6!">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <EventCard key={i} />
-            ))}
-          </div>
-        </Marquee>
+        <EventMaquee />
       </div>
     </main>
   );

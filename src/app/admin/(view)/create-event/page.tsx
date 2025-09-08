@@ -166,7 +166,6 @@ export default function CreateEventPage() {
   }
 
   function onCancel() {
-    console.log("Cancelling...");
     form.reset();
   }
   return (

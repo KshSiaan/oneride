@@ -8,7 +8,6 @@ import { imgCreator } from "@/lib/func/functions";
 export default async function TeamMems() {
   const token = (await cookies()).get("token")?.value;
   const call: idk = await getTeamMembersApi({ status: "" }, token ?? "");
-  console.log(call.data[0]);
 
   return call.data.map(
     (x: { _id: string; image: string | null; name: string; role: string }) => (

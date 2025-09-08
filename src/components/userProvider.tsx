@@ -15,7 +15,6 @@ export default function UserProvider({
   initialUser = null,
 }: UserProviderProps) {
   const [user] = useState<User | null>(initialUser);
-  console.log("Provider Speaking.... 📞");
 
   return <UserContext.Provider value={user}>{children}</UserContext.Provider>;
 }

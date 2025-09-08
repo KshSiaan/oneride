@@ -295,8 +295,8 @@ export const addAboutUsApi = async (
 };
 
 
-export const getAboutUsApi = async (token: string) => {
-    return howl("/about-us", { method: "GET", token })
+export const getAboutUsApi = async () => {
+    return howl("/about-us", { method: "GET", })
 }
 
 // >>>>>>>>>>> Team Member <<<<<<<<<<<<<
@@ -371,39 +371,10 @@ export const deleteTeamMemberApi = async (id: string, token: string) => {
 export const getTeamMembersApi = async ({ status, type }: { status?: string; type?: string }, token: string) => {
     return howl(`/team-members?status=${status ?? ""}&type=${type ?? ""}`, { method: "GET", token })
 }
-
-// // >>>>>>>>>>> Transport <<<<<<<<<<<<<
-
-// export const createTransportApi = async (
-//     body: { type: "busRoute" | "parkAndRide" | "pubPickup"; pickUpPoint: string; duration: number; departureTime: string },
-//     token: string
-// ) => {
-//     return howl("/transports", { method: "POST", body, token })
-// }
-
-// export const deleteTransportApi = async (id: string, token: string) => {
-//     return howl(`/transports/${id}`, { method: "DELETE", token })
-// }
-
-// export const getTransportsApi = async (token: string) => {
-//     return howl("/transports", { method: "GET", token })
-// }
-
 // >>>>>>>>>>> Event <<<<<<<<<<<<<
 
 export const createEventApi = async (body: FormData, token: string) => {
-  // log FormData keys + values
-  // for (const [key, value] of body.entries()) {
-  //   if (value instanceof File) {
-  //     console.log(key, {
-  //       name: value.name,
-  //       size: value.size,
-  //       type: value.type,
-  //     });
-  //   } else {
-  //     console.log(key, value);
-  //   }
-  // }
+
 
   const res = await fetch(`${base_api}/events`, {
     method: "POST",

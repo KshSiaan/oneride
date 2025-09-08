@@ -34,8 +34,7 @@ export default function ProfUpdateForm() {
     },
   });
 
-  function submitter(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  function submitter() {
     toast.success("Your profile data is updated");
   }
 

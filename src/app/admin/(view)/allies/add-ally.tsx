@@ -87,7 +87,6 @@ export default function AddAlly() {
   });
 
   const onSubmit: SubmitHandler<AllyForm> = (data) => {
-    // console.log(data);
     mutate(data);
   };
 
