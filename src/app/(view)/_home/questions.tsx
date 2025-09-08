@@ -6,7 +6,10 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-export default function Questions() {
+import { howl, idk } from "@/lib/utils";
+export default async function Questions() {
+  const call: idk = await howl("/faqs");
+  const faqs = call.data.slice(0, 6);
   return (
     <div className="w-full px-[7%]! grid lg:grid-cols-2 gap-6 mt-24! border-t pt-12!">
       <div className="space-y-6!">
@@ -23,14 +26,14 @@ export default function Questions() {
       </div>
       <div className="">
         <Accordion type="single" collapsible>
-          {faqData.map((faq, idx) => (
-            <AccordionItem
-              key={idx}
-              value={`item-${idx + 1}`}
-              className="border-b!"
-            >
+          {faqs.map((faq: idk) => (
+            <AccordionItem key={faq._id} value={faq._id}>
               <AccordionTrigger>{faq.question}</AccordionTrigger>
-              <AccordionContent>{faq.answer}</AccordionContent>
+              <AccordionContent>
+                <div className="text-sm text-muted-foreground">
+                  {faq.answer}
+                </div>
+              </AccordionContent>
             </AccordionItem>
           ))}
         </Accordion>
