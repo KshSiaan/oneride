@@ -2,7 +2,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { FileDownIcon, Loader2Icon, PlusIcon, SearchIcon } from "lucide-react";
+import { FileDownIcon, Loader2Icon, SearchIcon } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import {
   Select,
@@ -62,10 +62,6 @@ export default function Page() {
           <h1 className="text-2xl">Charter Requests</h1>
           <p>Manage all charter booking requests from users</p>
         </div>
-        <Button className="rounded text-foreground" size="lg">
-          <PlusIcon />
-          Create New Event
-        </Button>
       </div>
 
       {/* Stats */}
