@@ -19,8 +19,9 @@ import { ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
-import { verifyEmailApi } from "@/lib/api/auth";
+import { sendOtpApi, verifyEmailApi } from "@/lib/api/auth";
 import { idk } from "@/lib/utils";
+import { useCookies } from "react-cookie";
 
 // ----- Zod schema -----
 const verificationSchema = z.object({
@@ -30,11 +31,14 @@ const verificationSchema = z.object({
 type VerificationFormData = z.infer<typeof verificationSchema>;
 
 export default function AuthForms() {
+  const [, setCookie] = useCookies(["token"]);
   const [emType, setEmType] = useState<
     "verif_mail" | "forgot_mail" | "none" | null
   >(null);
   const [email, setEmail] = useState<string | null>(null);
+  const [cooldown, setCooldown] = useState<number>(0);
   const { back, push } = useRouter();
+
   const { mutate } = useMutation({
     mutationKey: ["verifyOtp"],
     mutationFn: ({ emailVerifyCode }: { emailVerifyCode: string }) => {
@@ -48,10 +52,12 @@ export default function AuthForms() {
       toast.error(err.message ?? "Invalid OTP");
     },
     onSuccess: (data: idk) => {
-      toast.success(data.message ?? "Email Verifed Successfully!");
+      toast.success(data.message ?? "Email Verified Successfully!");
       if (emType === "forgot_mail") {
+        setCookie("token", data.data.token);
         push("/reset");
       } else if (emType === "verif_mail") {
+        setCookie("token", data.data.token);
         localStorage.removeItem("verif_mail");
         push("/");
       } else {
@@ -59,6 +65,7 @@ export default function AuthForms() {
       }
     },
   });
+
   const form = useForm<VerificationFormData>({
     resolver: zodResolver(verificationSchema),
     defaultValues: { code: "" },
@@ -66,7 +73,6 @@ export default function AuthForms() {
 
   useEffect(() => {
     const verif_mail = localStorage.getItem("verif_mail");
-
     if (verif_mail) {
       setEmType("verif_mail");
       setEmail(verif_mail);
@@ -84,6 +90,32 @@ export default function AuthForms() {
       }
     }
   }, []);
+
+  // Countdown timer for resend
+  useEffect(() => {
+    if (cooldown > 0) {
+      const timer = setInterval(() => {
+        setCooldown((prev) => prev - 1);
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [cooldown]);
+
+  const handleResendCode = async () => {
+    if (!email) return toast.error("Email not found");
+
+    try {
+      const res: idk = await sendOtpApi({ email });
+      if (res.success) {
+        toast.success(res.message ?? "Verification code resent!");
+        setCooldown(60); // 60 seconds cooldown
+      } else {
+        toast.error(res.message ?? "Failed to resend code");
+      }
+    } catch (err: any) {
+      toast.error(err.message ?? "Something went wrong");
+    }
+  };
 
   const onSubmit = (data: VerificationFormData) => {
     mutate({ emailVerifyCode: data.code });
@@ -109,16 +141,22 @@ export default function AuthForms() {
                   <FormItem className="!space-y-2">
                     <div className="flex justify-between items-center">
                       <FormLabel>Verification code</FormLabel>
+
                       <Button
                         variant="link"
-                        className="text-sm text-accent-foreground hover:text-accent-foreground/80 font-medium"
+                        className="text-sm text-accent-foreground hover:text-accent-foreground/80 font-medium disabled:opacity-50"
                         type="button"
+                        onClick={handleResendCode}
+                        disabled={cooldown > 0}
                       >
-                        Resend code
+                        {cooldown > 0
+                          ? `Resend in ${cooldown}s`
+                          : "Resend code"}
                       </Button>
                     </div>
+
                     <FormControl>
-                      <Input {...field} placeholder="Enter 6-digit code" />
+                      <Input {...field} placeholder="Enter 4-digit code" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

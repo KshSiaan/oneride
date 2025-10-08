@@ -1,16 +1,32 @@
-"use server";
+"use client";
 import EventCard from "@/components/core/event-card";
 import { getEventsApi } from "@/lib/api/core";
 import { dateExtractor, timeExtractor } from "@/lib/func/functions";
 import { idk } from "@/lib/utils";
-import { cookies } from "next/headers";
+import { useQuery } from "@tanstack/react-query";
+import { Loader2Icon } from "lucide-react";
 import React from "react";
+import { useCookies } from "react-cookie";
 
-export default async function Events() {
-  const token = (await cookies()).get("token")?.value;
-  const call: idk = await getEventsApi(token ?? "");
-
-  return call.data.map(
+export default function Events({ search }: { search: string }) {
+  const [{ token }] = useCookies(["token"]);
+  const { data, isPending } = useQuery({
+    queryKey: ["events", search],
+    queryFn: (): idk =>
+      getEventsApi(token, {
+        title: search || undefined,
+      }),
+  });
+  if (isPending) {
+    return (
+      <div
+        className={`flex justify-center items-center h-24 mx-auto lg:col-span-3`}
+      >
+        <Loader2Icon className={`animate-spin`} />
+      </div>
+    );
+  }
+  return data.data.map(
     (x: {
       _id: string;
       title: string;

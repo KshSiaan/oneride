@@ -18,7 +18,10 @@ export const verifyEmailApi = async (body: { email: string; emailVerifyCode: str
   return howl("/auth/verify-email", { method: "POST", body })
 }
 
-export const resetPasswordApi = async (body: { email: string; password: string; confirmPassword: string }, token: string) => {
+export const resetPasswordApi = async (body: 
+  { password: string; 
+    confirmPassword: string }, 
+    token: string) => {
   return howl("/auth/reset-password", { method: "POST", body, token })
 }
 

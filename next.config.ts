@@ -8,13 +8,11 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "http",
-        hostname: "10.10.10.70",
-        port: "5000",
-        pathname: "/public/uploads/images/**",
+        hostname: "**", // Allow all HTTP hosts
       },
       {
         protocol: "https",
-        hostname: "**", // keep your fallback
+        hostname: "**", // Allow all HTTPS hosts
       },
     ],
   },

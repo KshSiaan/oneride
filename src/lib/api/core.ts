@@ -520,13 +520,14 @@ export const createBookingGuestApi = async (
 }
 
 export const getBookingsApi = async (
-    params: { filterByQuarter?: string; name?: string; status?: string } = {},
+    params: { filterByQuarter?: string; name?: string; status?: string,search?:string } = {},
 
 ) => {
     const query = new URLSearchParams()
     if (params.filterByQuarter) query.append("filterByQuarter", params.filterByQuarter)
     if (params.name) query.append("name", params.name)
     if (params.status) query.append("status", params.status)
+    if (params.search) query.append("search", params.search)
 
     return howl(`/bookings?${query.toString()}`, { method: "GET"})
 }

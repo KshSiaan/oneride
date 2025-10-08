@@ -135,8 +135,8 @@ export default function CreateEventPage() {
       endTime: "",
       venueName: "",
       transportation: [],
-      totalSeat: "0", // ✅ string
-      ticketPrice: "0", // ✅ string
+      totalSeat: "", // ✅ string
+      ticketPrice: "", // ✅ string
       adminStatus: "draft",
       websiteStatus: "upcoming",
       eventStatus: "active", // ✅ default

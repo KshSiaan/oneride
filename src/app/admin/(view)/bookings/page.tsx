@@ -22,18 +22,26 @@ export default function Page() {
   >();
   const [selectedStatus, setSelectedStatus] = useState<string | undefined>();
   const [selectedDate, setSelectedDate] = useState<string | undefined>();
+  const [search, setSearch] = useState<string>("");
   const { data: categoryData, isPending: categoryPending }: idk = useQuery({
     queryKey: ["cat"],
     queryFn: getCategoriesApi,
   });
 
   const { data, isPending } = useQuery({
-    queryKey: ["bookings"],
+    queryKey: [
+      "bookings",
+      search,
+      selectedCategory,
+      selectedDate,
+      selectedStatus,
+    ],
     queryFn: () => {
       return getBookingsApi({
         status: selectedStatus,
         name: selectedCategory,
         filterByQuarter: selectedDate,
+        search,
       });
     },
   });
@@ -46,10 +54,10 @@ export default function Page() {
             Track, manage, and take action on every booking across all events.
           </p>
         </div>
-        <Button className="rounded text-foreground" size="lg">
+        {/* <Button className="rounded text-foreground" size="lg">
           <PlusIcon />
           Create New Event
-        </Button>
+        </Button> */}
       </div>
       <div className="w-full grid grid-cols-6 mt-6! gap-6">
         <div className="w-full border bg-none rounded-lg flex items-center px-4! bg-secondary col-span-3">
@@ -58,6 +66,10 @@ export default function Page() {
             placeholder="Search by name or email"
             className="border-0 shadow-none outline-0! ring-0! bg-inherit!"
             inputMode="search"
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+            }}
           />
         </div>
         {/* Category Select */}

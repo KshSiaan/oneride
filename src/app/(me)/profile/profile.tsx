@@ -50,6 +50,7 @@ export default function Profile({
   isPending: boolean;
 }) {
   const [cookies] = useCookies(["token"]);
+
   const form = useForm<ProfileValues>({
     resolver: zodResolver(ProfileSchema),
     defaultValues: {
@@ -60,134 +61,149 @@ export default function Profile({
     },
     mode: "onSubmit",
   });
-  useEffect(() => {
-    if (!isPending) {
 
-      form.setValue("name", data.data.name ?? "");
-      form.setValue("email", data.data.email ?? "");
-      form.setValue("phone", data.data.phone ?? "");
-      form.setValue("gender", data.data.gender ?? "");
+  useEffect(() => {
+    if (!isPending && data?.data) {
+      form.setValue("name", data?.data?.name ?? "");
+      form.setValue("email", data?.data?.email ?? "");
+      form.setValue("phone", data?.data?.phone ?? "");
+      form.setValue("gender", data?.data?.gender ?? "");
     }
   }, [data, form, isPending]);
+
   const { mutate } = useMutation({
     mutationKey: ["profile_update"],
-    mutationFn: (data: FormData) => {
-      return updateUserProfileApi(data, cookies.token);
+    mutationFn: (formData: FormData) => {
+      return updateUserProfileApi(formData, cookies?.token ?? "");
     },
   });
 
   const onSubmit = (values: ProfileValues) => {
-    // convert values to FormData
-    const formData = new FormData();
-    formData.append("name", values.name);
-    formData.append("phone", values.phone);
-    formData.append("gender", values.gender);
+    try {
+      const formData = new FormData();
+      formData.append("name", values?.name ?? "");
+      formData.append("phone", values?.phone ?? "");
+      formData.append("gender", values?.gender ?? "");
 
-    mutate(formData, {
-      onSuccess: (data) => {
-        setUpdating(false);
-        toast.success(
-          data.message ?? "Profile Information Updated Successfully"
-        );
-      },
-      onError: (error) => {
-        toast.error(error.message ?? "Failed to update Profile Information");
-      },
-    });
+      mutate(formData, {
+        onSuccess: (res) => {
+          setUpdating(false);
+          toast.success(
+            res?.message ?? "Profile Information Updated Successfully"
+          );
+        },
+        onError: (err: any) => {
+          toast.error(err?.message ?? "Failed to update Profile Information");
+        },
+      });
+    } catch (error) {
+      toast.error("Unexpected error occurred. Please try again.");
+      console.error(error);
+    }
   };
+
+  const safeDataAvailable = data?.data && !isPending;
 
   return (
     <div className="w-full">
-      <Form {...form}>
-        <form
-          className="space-y-4"
-          onSubmit={form.handleSubmit(onSubmit)}
-          noValidate
-        >
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Name</FormLabel>
-                <FormControl>
-                  <Input readOnly={!updating} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="email"
-            disabled
-            render={({ field }) => (
-              <FormItem>
-                <Label>Email Address</Label>
-                <Input type="email" {...field} />
-                <FormControl></FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Phone</FormLabel>
-                <FormControl>
-                  <Input readOnly={!updating} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="gender"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Gender</FormLabel>
-                <Select
-                  disabled={!updating}
-                  onValueChange={(v) => field.onChange(v)}
-                  value={field.value}
-                >
+      {safeDataAvailable ? (
+        <Form {...form}>
+          <form
+            className="space-y-4"
+            onSubmit={form.handleSubmit(onSubmit)}
+            noValidate
+          >
+            {/* Name */}
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select Gender" />
-                    </SelectTrigger>
+                    <Input readOnly={!updating} {...field} />
                   </FormControl>
-                  <SelectContent>
-                    <SelectItem value="male">Male</SelectItem>
-                    <SelectItem value="female">Female</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          {updating && (
-            <div className="flex justify-end items-center gap-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  setUpdating(false);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button type="submit">Save</Button>
-            </div>
-          )}
-        </form>
-      </Form>
+            {/* Email */}
+            <FormField
+              control={form.control}
+              name="email"
+              disabled
+              render={({ field }) => (
+                <FormItem>
+                  <Label>Email Address</Label>
+                  <Input type="email" {...field} readOnly />
+                  <FormControl></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Phone */}
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone</FormLabel>
+                  <FormControl>
+                    <Input readOnly={!updating} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Gender */}
+            <FormField
+              control={form.control}
+              name="gender"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Gender</FormLabel>
+                  <Select
+                    disabled={!updating}
+                    onValueChange={(v) => field.onChange(v)}
+                    value={field.value ?? ""}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select Gender" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="male">Male</SelectItem>
+                      <SelectItem value="female">Female</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {updating && (
+              <div className="flex justify-end items-center gap-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setUpdating(false)}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit">Save</Button>
+              </div>
+            )}
+          </form>
+        </Form>
+      ) : (
+        <div className="text-center py-10 text-sm text-muted-foreground">
+          {isPending ? "Loading profile data..." : "No profile data available."}
+        </div>
+      )}
     </div>
   );
 }

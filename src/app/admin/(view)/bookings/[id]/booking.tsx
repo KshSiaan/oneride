@@ -24,20 +24,20 @@ import { notFound } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { idk } from "@/lib/utils";
 import { dateExtractor, timeExtractor } from "@/lib/func/functions";
+
 export default function Booking({ id }: { id: string }) {
   const [cookies] = useCookies(["token"]);
+
   const {
     data,
     isPending,
     isError,
     error: err,
   } = useQuery({
-    queryKey: ["booking"],
-    queryFn: (): idk => {
-      return getBookingByIdApi(id, cookies.token);
-    },
+    queryKey: ["booking", id],
+    queryFn: (): idk => getBookingByIdApi(id, cookies.token),
   });
-  //   const { data: user };
+
   if (isPending) {
     return (
       <section className="w-full space-y-6">
@@ -54,216 +54,217 @@ export default function Booking({ id }: { id: string }) {
   }
 
   if (isError) {
-    if (err.message === "Validation failed") {
-      return notFound();
-      //   return JSON.stringify(err);
-    }
-    return JSON.stringify(err);
+    if (err.message === "Validation failed") return notFound();
+    return <pre>{JSON.stringify(err, null, 2)}</pre>;
   }
 
-  const info = data.data;
+  const info = data?.data;
+  if (!info) return notFound();
 
+  // dynamic user object — either user or guestUser
+  const user = info.user ?? info.guestUser ?? {};
 
-  const bookingData = {
-    booking: {
-      id: "#BK-2002-1969",
-      date: "10 Jun 2025, 2:00 PM",
-      seats: 4,
-      totalAmount: "$120.00 NZD",
-      paymentStatus: "Paid",
-      bookingStatus: "Confirmed",
-      event: "Wellington Night Market",
-    },
-    user: {
-      name: "Sarah Johnson",
-      email: "Sarah@example.com",
-      phone: "+01222222222",
-      accountStatus: "Active",
-    },
-    payment: {
-      transactionId: "TXN-465675847",
-      method: "Visa ****4562",
-      date: "10 Jun 2025, 6:30 PM",
-    },
-  };
+  const totalAmount =
+    info.event?.ticketPrice && info.ticketCount
+      ? info.ticketCount * info.event.ticketPrice
+      : "N/A";
 
   return (
     <>
-      <Card className="">
-        <CardHeader className=" ">
-          <CardTitle className="flex items-center gap-2 ">
+      {/* Booking Summary */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5 text-primary" />
-            Bookings Summary
+            Booking Summary
           </CardTitle>
         </CardHeader>
-        <CardContent className="p-6! pt-0!">
+        <CardContent>
           <div className="grid grid-cols-3 gap-8">
-            <div className="space-y-6!">
+            <div className="space-y-6">
               <div>
-                <p className="text-sm font-medium text-muted-foreground mb-1!">
+                <p className="text-sm font-medium text-muted-foreground mb-1">
                   # Booking ID
                 </p>
-                <p className="text-lg font-semibold">{info._id}</p>
+                <p className="text-lg font-semibold">{info?._id ?? "N/A"}</p>
               </div>
+
               <div>
-                <p className="text-sm font-medium text-muted-foreground mb-1!">
+                <p className="text-sm font-medium text-muted-foreground mb-1">
                   $ Total Amount
                 </p>
                 <p className="text-lg font-semibold">
-                  ${info.ticketCount * info.event.ticketPrice}
+                  {totalAmount !== "N/A" ? `$${totalAmount}` : "N/A"}
                 </p>
               </div>
+
               <div>
-                <p className="text-sm font-medium text-muted-foreground mb-4! flex items-center gap-2">
+                <p className="text-sm font-medium text-muted-foreground mb-1 flex items-center gap-2">
                   <CalendarCheck className="size-4" /> Event
                 </p>
                 <p className="text-lg font-semibold text-primary">
-                  {info.event.title}
+                  {info?.event?.title ?? "Event Deleted / N/A"}
                 </p>
               </div>
             </div>
 
-            <div className="space-y-6!">
+            <div className="space-y-6">
               <div>
-                <p className="text-sm font-medium text-muted-foreground mb-1!">
+                <p className="text-sm font-medium text-muted-foreground mb-1">
                   # Booking Date
                 </p>
                 <p className="text-lg font-semibold">
-                  {dateExtractor(info.event.startDate)} -{" "}
-                  {timeExtractor(info.event.startTime)}
+                  {info?.event
+                    ? `${dateExtractor(info.event.startDate)} - ${timeExtractor(
+                        info.event.startTime
+                      )}`
+                    : dateExtractor(info?.createdAt ?? "")}
                 </p>
               </div>
+
               <div>
-                <p className="text-sm font-medium text-muted-foreground mb-4! flex items-center gap-2">
+                <p className="text-sm font-medium text-muted-foreground mb-1 flex items-center gap-2">
                   <CreditCard className="size-4" /> Payment Status
                 </p>
-                <Badge variant={!info.paid ? "secondary" : "success"}>
-                  {info.paid ? "Paid" : "Unpaid"}
+                <Badge variant={info?.paid ? "success" : "secondary"}>
+                  {info?.paid ? "Paid" : "Unpaid"}
                 </Badge>
               </div>
             </div>
 
-            <div className="space-y-6!">
+            <div className="space-y-6">
               <div>
-                <p className="text-sm font-medium text-muted-foreground mb-1!">
+                <p className="text-sm font-medium text-muted-foreground mb-1">
                   # Number of Seats
                 </p>
                 <p className="text-lg font-semibold">
-                  {bookingData.booking.seats}
+                  {info?.ticketCount ?? "N/A"}
                 </p>
               </div>
+
               <div>
-                <p className="text-sm font-medium text-muted-foreground mb-4! flex items-center gap-2">
+                <p className="text-sm font-medium text-muted-foreground mb-1 flex items-center gap-2">
                   <Calendar className="size-4" /> Booking Status
                 </p>
                 <Badge
-                  variant={info.status === "pending" ? "outline" : "success"}
+                  variant={
+                    info?.status === "pending"
+                      ? "outline"
+                      : info?.status === "confirmed"
+                      ? "success"
+                      : "secondary"
+                  }
                 >
-                  {info.status}
+                  {info?.status ?? "N/A"}
                 </Badge>
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
+
       {/* User Information */}
-      <Card className="">
-        <CardHeader className="">
+      <Card>
+        <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <User className="h-5 w-5 text-primary" />
             User Information
           </CardTitle>
         </CardHeader>
-        <CardContent className="p-6!">
+        <CardContent>
           <div className="grid grid-cols-3 gap-8">
             <div>
-              <p className="text-sm font-medium text-muted-foreground mb-1! flex items-center gap-1">
+              <p className="text-sm font-medium text-muted-foreground mb-1 flex items-center gap-1">
                 <User className="h-4 w-4" /> Name
               </p>
-              <p className="text-lg font-semibold">{bookingData.user.name}</p>
+              <p className="text-lg font-semibold">
+                {`${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim() ||
+                  "N/A"}
+              </p>
             </div>
 
             <div>
-              <p className="text-sm font-medium text-muted-foreground mb-1! flex items-center gap-1">
+              <p className="text-sm font-medium text-muted-foreground mb-1 flex items-center gap-1">
                 <Mail className="h-4 w-4" /> Email
               </p>
-              <p className="text-lg font-semibold">{bookingData.user.email}</p>
+              <p className="text-lg font-semibold">{user?.email ?? "N/A"}</p>
             </div>
 
             <div>
-              <p className="text-sm font-medium text-muted-foreground mb-1! flex items-center gap-1">
+              <p className="text-sm font-medium text-muted-foreground mb-1 flex items-center gap-1">
                 <Phone className="h-4 w-4" /> Phone
               </p>
-              <p className="text-lg font-semibold">{bookingData.user.phone}</p>
+              <p className="text-lg font-semibold">{user?.phone ?? "N/A"}</p>
             </div>
           </div>
 
-          <Separator className="my-6!" />
+          <Separator className="my-6" />
 
           <div>
-            <p className="text-sm font-medium text-muted-foreground mb-2! flex items-center gap-1">
+            <p className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-1">
               <Users className="h-4 w-4" /> Account Status
             </p>
-            <Badge variant="secondary" className="bg-green-500">
-              {bookingData.user.accountStatus}
+            <Badge
+              variant={user?.isActive ? "success" : "secondary"}
+              className={user?.isActive ? "bg-green-500" : "bg-gray-400"}
+            >
+              {user?.isActive ? "Active" : "Inactive"}
             </Badge>
           </div>
         </CardContent>
       </Card>
+
       {/* Payment Information */}
-      <Card className="">
-        <CardHeader className="">
-          <CardTitle className="flex items-center gap-2 ">
-            <CreditCard className="h-5 w- text-primary" />
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CreditCard className="h-5 w-5 text-primary" />
             Payment Information
           </CardTitle>
         </CardHeader>
-        <CardContent className="p-6!">
+        <CardContent>
           <div className="grid grid-cols-3 gap-8">
             <div>
-              <p className="text-sm font-medium text-muted-foreground mb-1!">
+              <p className="text-sm font-medium text-muted-foreground mb-1">
                 # Transaction ID
               </p>
-              <p className="text-lg font-semibold">
-                {bookingData.payment.transactionId}
-              </p>
+              <p className="text-lg font-semibold">N/A</p>
             </div>
 
             <div>
-              <p className="text-sm font-medium text-muted-foreground mb-1! flex items-center gap-2">
+              <p className="text-sm font-medium text-muted-foreground mb-1 flex items-center gap-2">
                 <CreditCard className="size-4" /> Payment Method
               </p>
-              <p className="text-lg font-semibold">
-                {bookingData.payment.method}
-              </p>
+              <p className="text-lg font-semibold">N/A</p>
             </div>
 
             <div>
-              <p className="text-sm font-medium text-muted-foreground mb-1! flex items-center gap-2">
+              <p className="text-sm font-medium text-muted-foreground mb-1 flex items-center gap-2">
                 <Coins className="size-4" /> Payment Date
               </p>
               <p className="text-lg font-semibold">
-                {bookingData.payment.date}
+                {dateExtractor(info?.updatedAt ?? "")}
               </p>
             </div>
           </div>
         </CardContent>
       </Card>
+
       {/* Booking Actions */}
-      <Card className="">
-        <CardHeader className="">
+      <Card>
+        <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Settings className="h-5 w-5 text-primary" />
             Booking Actions
           </CardTitle>
         </CardHeader>
-        <CardContent className="p-6">
+        <CardContent>
           <div className="flex gap-4">
             <Button variant="destructive" className="flex items-center gap-2">
               <X className="h-4 w-4" />
               Cancel Booking
             </Button>
-            <Button variant="outline" className="">
+            <Button variant="outline" className="flex items-center gap-2">
               <Send className="h-4 w-4" />
               Resend Confirmation
             </Button>

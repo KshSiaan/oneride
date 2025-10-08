@@ -1,11 +1,12 @@
-"use server";
+"use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import React, { Suspense } from "react";
+import React, { Suspense, useState } from "react";
 import Events from "./events";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default async function Page() {
+export default function Page() {
+  const [search, setSearch] = useState<string>("");
   return (
     <>
       <header
@@ -25,6 +26,10 @@ export default async function Page() {
               <Input
                 className="rounded-r-none!"
                 placeholder="Search events or locations...."
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                }}
               />
               <Button className="rounded-r-lg">Search</Button>
             </div>
@@ -46,7 +51,7 @@ export default async function Page() {
               </>
             }
           >
-            <Events />
+            <Events search={search} />
           </Suspense>
         </div>
       </main>

@@ -27,7 +27,7 @@ export default function Footer() {
         <h3 className="text-lg font-bold">QUICK LINKS</h3>
         <Link href="/">Home</Link>
         <Link href="/about">About us</Link>
-        <Link href="/contact">Contact Us</Link>
+        <Link href="/about">Contact Us</Link>
         <Link href="/events">Events Near You</Link>
         <Link href="/allies">Allies</Link>
       </div>

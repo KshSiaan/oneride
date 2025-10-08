@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PlusIcon, SearchIcon } from "lucide-react";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -21,23 +21,42 @@ import Link from "next/link";
 export default function Page() {
   const [cookies] = useCookies(["token"]);
 
-  // State for each select
+  // State for filters
   const [selectedCategory, setSelectedCategory] = useState<
     string | undefined
   >();
   const [selectedStatus, setSelectedStatus] = useState<string | undefined>();
   const [selectedDate, setSelectedDate] = useState<string | undefined>();
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
+  // Debounce search (waits 500ms after user stops typing)
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [search]);
+
+  // Events Query
   const { data, isPending } = useQuery({
-    queryKey: ["events", selectedCategory, selectedDate, selectedStatus],
+    queryKey: [
+      "events",
+      selectedCategory,
+      selectedDate,
+      selectedStatus,
+      debouncedSearch,
+    ],
     queryFn: () =>
       getEventsApi(cookies.token, {
         filterByQuarter: selectedDate,
         adminStatus: selectedStatus,
         category: selectedCategory,
+        title: debouncedSearch || undefined,
       }),
   });
 
+  // Categories Query
   const { data: categoryData, isPending: categoryPending }: idk = useQuery({
     queryKey: ["cat"],
     queryFn: getCategoriesApi,
@@ -59,12 +78,15 @@ export default function Page() {
       </div>
 
       <div className="w-full grid grid-cols-6 mt-6! gap-6">
+        {/* Search */}
         <div className="w-full border bg-none rounded-lg flex items-center px-4! bg-secondary col-span-3">
           <SearchIcon className="text-muted-foreground size-4" />
           <Input
-            placeholder="Search by name or email"
+            placeholder="Search by event name"
             className="border-0 shadow-none outline-0! ring-0! bg-inherit!"
             inputMode="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
           />
         </div>
 
@@ -75,7 +97,7 @@ export default function Page() {
           </SelectTrigger>
           <SelectContent>
             {!categoryPending &&
-              categoryData.data.map((x: { _id: string; name: string }) => (
+              categoryData?.data?.map((x: { _id: string; name: string }) => (
                 <SelectItem value={x.name} key={x._id} className="capitalize">
                   {x.name}
                 </SelectItem>
