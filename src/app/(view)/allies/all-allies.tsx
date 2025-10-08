@@ -11,7 +11,13 @@ export default async function AllAllies() {
   const call: idk = await getAlliesApi({ page: 1 });
 
   return call.data.result.map(
-    (x: { _id: string; name: string; location: string; type: string }) => (
+    (x: {
+      _id: string;
+      name: string;
+      location: string;
+      type: string;
+      websiteURL?: string;
+    }) => (
       <Card key={x._id}>
         <CardContent className="flex flex-col items-center gap-4">
           <Badge className="mx-auto bg-green-500/60">{x.type}</Badge>
@@ -25,12 +31,14 @@ export default async function AllAllies() {
           </div>
         </CardContent>
         <CardFooter className="flex justify-center items-center">
-          <Button className="text-foreground" asChild>
-            <Link href={`/`}>
-              <ExternalLinkIcon />
-              Visit website
-            </Link>
-          </Button>
+          {x.websiteURL && (
+            <Button className="text-foreground" asChild>
+              <Link href={x?.websiteURL}>
+                <ExternalLinkIcon />
+                Visit website
+              </Link>
+            </Button>
+          )}
         </CardFooter>
       </Card>
     )
