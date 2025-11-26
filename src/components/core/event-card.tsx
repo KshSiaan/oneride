@@ -31,7 +31,7 @@ export default function EventCard({
           <div className="h-full w-full backdrop-brightness-50 flex flex-col justify-end items-start space-y-2! lg:space-y-6! p-6! font-serif">
             <h3 className="text-xl lg:text-3xl">Way To</h3>
             <h2 className="text-2xl lg:text-5xl">{title ?? "N/A"}</h2>
-            <h3 className="text-xl lg:text-3xl">{location ?? "N/A"}</h3>
+            {/* <h3 className="text-xl lg:text-3xl">{location ?? "N/A"}</h3> */}
             <p className="text-sm lgtext-xl text-primary">
               {startDate || startTime
                 ? `${startDate ?? "N/A"} · ${startTime ?? "N/A"}`
