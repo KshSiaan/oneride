@@ -99,7 +99,6 @@ export default function ChartForm() {
       toast.error("Something went wrong");
     }
 
-
     // toast(
     //   <pre className="mt-2 w-full rounded-md p-4">
     //     <code className="text-white">{JSON.stringify(formatted, null, 2)}</code>
@@ -148,7 +147,7 @@ export default function ChartForm() {
             <FormItem className="flex flex-col items-start">
               <FormLabel>Phone</FormLabel>
               <FormControl className="w-full">
-                <PhoneInput placeholder="" {...field} defaultCountry="TR" />
+                <PhoneInput placeholder="" {...field} defaultCountry="BD" />
               </FormControl>
               <FormMessage />
             </FormItem>

@@ -120,11 +120,11 @@ const charterCards = [
   {
     icon: User2Icon,
     title: "Experienced Drivers",
-    desc: "Professional drivers with extensive knowledge of New Zealand roads.",
+    desc: "Professional drivers with extensive knowledge of Bangladesh roads.",
   },
   {
     icon: MapIcon,
-    title: "Anywhere in NZ",
+    title: "Anywhere in BD",
     desc: "We operate nationwide, from Auckland to Queenstown and everywhere between.",
   },
 ];
@@ -162,7 +162,7 @@ const tripData = [
   {
     title: "Tours",
     description:
-      "Explore New Zealand’s beautiful landscapes with our comfortable coaches.",
+      "Explore Bangladeshi beautiful landscapes with our comfortable coaches.",
     image: "/image/charter/charter (6).jpg",
   },
 ];

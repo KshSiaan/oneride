@@ -109,7 +109,7 @@ export default function AvailableRides({
                         pickup={ride.pickUpPoint.name.split(",")[0]}
                         duration={`${parseInt(ride.duration).toFixed(0)} min`}
                         returner={timeExtractor(ride.departureTime)}
-                        price={ride.price ? `$${ride.price}` : null}
+                        price={ride.price ? `${ride.price} BDT` : null}
                       />
                     ))
                   ) : (

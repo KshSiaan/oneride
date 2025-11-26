@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -64,12 +63,10 @@ export default function HeroCarousel({
                 >
                   <div className="h-full w-full flex flex-col justify-end items-start space-y-6! p-6! font-serif">
                     <h3 className="text-xl lg:text-3xl">Way To</h3>
-                    <h2 className="text-3xl lg:text-5xl">
-                      Eminem Live in Concert{" "}
-                    </h2>
-                    <h3 className="text-xl lg:text-3xl">Auckland Stadium</h3>
+                    <h2 className="text-3xl lg:text-5xl">{slide.alt}</h2>
+                    <h3 className="text-xl lg:text-3xl">Dhaka,Bangladesh</h3>
                     <p className="text-base text-primary">
-                      June 21, 2025 · 7:30 PM
+                      January 21, 2025 · 7:30 AM
                     </p>
                   </div>
                 </CardContent>

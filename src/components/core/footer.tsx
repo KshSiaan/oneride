@@ -15,12 +15,11 @@ export default function Footer() {
           className="w-1/2"
           alt="icon"
         />
-        <p>info@poolvalet.com</p>
+        <p>info@oneride.bd</p>
         <p className="text-sm font-semibold text-accent-foreground">
           Customer Supports:
         </p>
-        <p className="text-lg font-semibold">(629) 00001111</p>
-        <p>8494 Signal Hill Road Manassas, Va</p>
+        <p>10A, Uttara, Dhaka, Bangladesh</p>
       </div>
 
       <div className="space-y-3! flex flex-col">

@@ -19,8 +19,8 @@ export default function Page() {
               Ride to Your Next Adventure
             </h1>
             <h3 className="text-sm lg:text-lg">
-              Book comfortable, affordable transport to major events across New
-              Zealand. No parking hassles, just good times.
+              Book comfortable, affordable transport to major events across
+              Bangladesh. No parking hassles, just good times.
             </h3>
             <div className="w-full flex justify-center items-center">
               <Input

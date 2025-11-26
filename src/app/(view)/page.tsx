@@ -6,32 +6,28 @@ import Eventer from "./_home/eventer";
 
 export default function Home() {
   const slideResouce = [
-    { id: 1, image: "/image/slide2.jpg", alt: "Stuff" },
+    { id: 1, image: "/image/ev1.png", alt: "Social Autumn Fest" },
     {
       id: 2,
-      image: "/image/slide1.png",
-      alt: "Eminem",
+      image: "/image/ev2.png",
+      alt: "AWS Community day BD",
     },
 
     {
       id: 3,
-      image: "/image/slide3.png",
-      alt: "Eminems",
+      image: "/image/eve3.jpeg",
+      alt: "Uthso Shondha",
     },
-    {
-      id: 4,
-      image: "/image/slide1.png",
-      alt: "Eminems",
-    },
+    { id: 4, image: "/image/ev1.png", alt: "Social Autumn Fest" },
     {
       id: 5,
-      image: "/image/slide1.png",
-      alt: "Eminems",
+      image: "/image/ev2.png",
+      alt: "AWS Community day BD",
     },
     {
       id: 6,
-      image: "/image/slide2.jpg",
-      alt: "Eminems",
+      image: "/image/eve3.jpeg",
+      alt: "Uthso Shondha",
     },
   ];
 

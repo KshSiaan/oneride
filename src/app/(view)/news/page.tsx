@@ -18,13 +18,13 @@ export default function Page() {
             <h3 className="text-sm lg:text-lg">
               Don’t miss out on what’s happening near you — get there with us.
             </h3>
-            <div className="w-full flex justify-center items-center">
+            {/* <div className="w-full flex justify-center items-center">
               <Input
                 className="rounded-r-none!"
                 placeholder="Search events or locations...."
               />
               <Button className="rounded-r-lg">Search</Button>
-            </div>
+            </div> */}
           </div>
         </div>
       </header>

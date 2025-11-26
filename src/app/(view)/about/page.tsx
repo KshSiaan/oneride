@@ -99,7 +99,7 @@ const trust = [
     title: "Friendly Support",
     features: [
       "24/7 customer service",
-      "NZ-based support team",
+      "BD-based support team",
       "Quick response times",
     ],
   },

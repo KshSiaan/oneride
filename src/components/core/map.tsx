@@ -87,7 +87,7 @@ export default function MapBase({
     <APIProvider apiKey={api_key}>
       <Map
         className={className} // ✅ apply className
-        defaultCenter={{ lat: -41.2865, lng: 174.7762 }}
+        defaultCenter={{ lat: 23.8103, lng: 90.4125 }}
         defaultZoom={12}
         disableDefaultUI={true}
         styles={darkStyle}

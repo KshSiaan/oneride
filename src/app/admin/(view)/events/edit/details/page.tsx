@@ -22,7 +22,7 @@ const bookingData = {
     id: "#BK-2002-1969",
     date: "10 Jun 2025, 2:00 PM",
     seats: 4,
-    totalAmount: "$120.00 NZD",
+    totalAmount: "120.00 BDT",
     paymentStatus: "Paid",
     bookingStatus: "Confirmed",
     event: "Wellington Night Market",

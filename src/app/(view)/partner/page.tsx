@@ -232,7 +232,7 @@ const tripData = [
   {
     title: "Tours",
     description:
-      "Explore New Zealand’s beautiful landscapes with our comfortable coaches.",
+      "Explore Bangladeshi beautiful landscapes with our comfortable coaches.",
     image: "/image/charter/charter (6).jpg",
   },
 ];

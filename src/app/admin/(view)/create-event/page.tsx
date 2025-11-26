@@ -496,7 +496,7 @@ export default function CreateEventPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-white">
-                        Ticket Price (NZD) *
+                        Ticket Price (BDT) *
                       </FormLabel>
                       <FormControl>
                         <Input
