@@ -295,7 +295,7 @@ export const addAboutUsApi = async (
 };
 
 
-export const getAboutUsApi = async () => {
+export const getAboutUsApi = async (token?: any) => {
     return howl("/about-us", { method: "GET", })
 }
 

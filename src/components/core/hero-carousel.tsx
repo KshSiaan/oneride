@@ -18,6 +18,7 @@ export default function HeroCarousel({
     id: number;
     image: string;
     alt: string;
+    date:string;
   }[];
 }) {
   const [api, setApi] = useState<any>();
@@ -66,7 +67,8 @@ export default function HeroCarousel({
                     <h2 className="text-3xl lg:text-5xl">{slide.alt}</h2>
                     <h3 className="text-xl lg:text-3xl">Dhaka,Bangladesh</h3>
                     <p className="text-base text-primary">
-                      January 21, 2025 · 7:30 AM
+                      {/* January 21, 2025 · 7:30 AM */}
+                      {slide.date}
                     </p>
                   </div>
                 </CardContent>

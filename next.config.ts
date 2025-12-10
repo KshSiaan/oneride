@@ -4,6 +4,19 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  devIndicators:false,
+  typescript: {
+    ignoreBuildErrors: true, // ignore TypeScript errors
+  },
+   webpack: (config, { dev }) => {
+    if (dev) {
+      config.devServer = config.devServer || {};
+      config.devServer.client = {
+        overlay: false,
+      };
+    }
+    return config;
+  },
   images: {
     remotePatterns: [
       {

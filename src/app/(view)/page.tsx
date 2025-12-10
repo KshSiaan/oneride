@@ -6,28 +6,49 @@ import Eventer from "./_home/eventer";
 
 export default function Home() {
   const slideResouce = [
-    { id: 1, image: "/image/ev1.png", alt: "Social Autumn Fest" },
+    {
+      id: 1,
+      image: "/image/ev1.png",
+      alt: "Happy New Year",
+      date: 'December 31, 2025 · 11:59 PM',
+    },
     {
       id: 2,
       image: "/image/ev2.png",
-      alt: "AWS Community day BD",
+      alt: "Victory Day",
+      date: 'December 16, 2025 · 6:00 AM',
+
     },
 
     {
       id: 3,
       image: "/image/eve3.jpeg",
       alt: "Uthso Shondha",
+      date: 'January 1, 2025 · 10:00 AM',
+
     },
-    { id: 4, image: "/image/ev1.png", alt: "Social Autumn Fest" },
+    {
+      id: 4,
+      image: "/image/ev1.png",
+      alt: "Happy New Year",
+
+      date: 'December 31, 2025 · 11:59 PM',
+    },
+
+
     {
       id: 5,
       image: "/image/ev2.png",
-      alt: "AWS Community day BD",
+      alt: "Victory Day",
+      date: 'December 16, 2025 · 6:00 AM',
+
     },
     {
       id: 6,
       image: "/image/eve3.jpeg",
       alt: "Uthso Shondha",
+      date: 'January 1, 2025 · 10:00 AM',
+
     },
   ];
 
