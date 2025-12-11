@@ -89,7 +89,7 @@ export default function Ride({ id }: { id: string }) {
         <div className="flex flex-col justify-between items-end">
           <div className="space-y-2!">
             <h3 className="text-3xl lg:text-5xl text-end text-green-500">
-              ${bag.price}
+              {bag.price} bdt
             </h3>
             <p>Per Roundtrip Ride </p>
           </div>

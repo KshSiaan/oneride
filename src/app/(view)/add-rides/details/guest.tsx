@@ -283,7 +283,7 @@ export default function Guest({ id }: { id: string }) {
                   <p>Seats</p>
                 </div>
                 <div className="flex flex-row justify-between items-center">
-                  <p className="text-xl text-green-600">${data.data.price}</p>
+                  <p className="text-xl text-green-600">{data.data.price} bdt</p>
                   <p className="text-primary text-xl">
                     {localStorage.getItem("ticketTotal")}
                   </p>
