@@ -3,11 +3,11 @@ import React from "react";
 
 export default function GettingThere() {
   const slideResouce = [
-    { id: 1, image: "/image/ev1.png", alt: "Social Autumn Fest" },
+    { id: 1, image: "/image/ev1.png", alt: "Happy New Year" },
     {
       id: 2,
       image: "/image/ev2.png",
-      alt: "AWS Community day BD",
+      alt: "Victory Day",
     },
 
     {
@@ -15,11 +15,11 @@ export default function GettingThere() {
       image: "/image/eve3.jpeg",
       alt: "Uthso Shondha",
     },
-    { id: 4, image: "/image/ev1.png", alt: "Social Autumn Fest" },
+    { id: 4, image: "/image/ev1.png", alt: "Happy New Year" },
     {
       id: 5,
       image: "/image/ev2.png",
-      alt: "AWS Community day BD",
+      alt: "Happy New Year",
     },
     {
       id: 6,

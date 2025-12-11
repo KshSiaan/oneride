@@ -13,8 +13,8 @@ import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { useQuery } from "@tanstack/react-query";
-import { getBlogsAdminApi } from "@/lib/api/core";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getBlogsAdminApi, deleteBlogApi } from "@/lib/api/core";
 import { useCookies } from "react-cookie";
 import { idk } from "@/lib/utils";
 import { blankImg } from "@/lib/config";
@@ -23,14 +23,33 @@ import { dateExtractor, imgCreator } from "@/lib/func/functions";
 
 export default function Blogs() {
   const [cookies] = useCookies(["token"]);
-  const { data, isPending } = useQuery({
+  const queryClient = useQueryClient();
+
+  // Fetch blogs
+  const { data, isLoading } = useQuery({
     queryKey: ["blogs"],
-    queryFn: (): idk => {
-      return getBlogsAdminApi(1, "", cookies.token);
+    queryFn: (): Promise<idk> => getBlogsAdminApi(1, "", cookies.token),
+  });
+
+  // Delete blog mutation
+  const deleteMutation = useMutation({
+    mutationFn: (blogId: string) => deleteBlogApi(blogId, cookies.token),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["blogs"]); // Refetch blogs after deletion
+    },
+    onError: (err) => {
+      console.error("Failed to delete blog:", err);
+      alert("Failed to delete blog. Please try again.");
     },
   });
 
-  if (isPending) {
+  const handleDelete = (id: string) => {
+    if (confirm("Are you sure you want to delete this blog?")) {
+      deleteMutation.mutate(id);
+    }
+  };
+
+  if (isLoading) {
     return (
       <div className="w-full mt-6 space-y-6">
         <Skeleton className="h-12" />
@@ -43,7 +62,9 @@ export default function Blogs() {
       </div>
     );
   }
-  const blogs = data.data.result;
+
+  const blogs = data?.data?.result || [];
+
   return (
     <Table>
       <TableHeader>
@@ -70,30 +91,27 @@ export default function Blogs() {
             </TableCell>
             <TableCell
               style={{
-                maxWidth: "150px", // adjust width
+                maxWidth: "150px",
                 whiteSpace: "nowrap",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
               }}
-              title={x.title} // shows full title on hover
+              title={x.title}
             >
               {x.title}
             </TableCell>
-
             <TableCell>{x.author}</TableCell>
-            <TableCell className="text-center">
-              {dateExtractor(x.createdAt)}
-            </TableCell>
+            <TableCell className="text-center">{dateExtractor(x.createdAt)}</TableCell>
             <TableCell className="text-center">
               <Badge className="bg-green-500">{x.status}</Badge>
             </TableCell>
-            <TableCell className="text-center">
+            <TableCell className="text-center flex justify-center gap-2">
               <Button size="icon" variant="ghost" asChild>
                 <Link href={`/news/${x._id}`}>
                   <EyeIcon />
                 </Link>
               </Button>
-              <Button size="icon" variant="ghost">
+              <Button size="icon" variant="ghost" asChild>
                 <Link href={`blogs/${x._id}`}>
                   <EditIcon />
                 </Link>
@@ -102,6 +120,7 @@ export default function Blogs() {
                 size="icon"
                 className="text-red-500 hover:text-red-600"
                 variant="ghost"
+                onClick={() => handleDelete(x._id)}
               >
                 <Trash2Icon />
               </Button>
